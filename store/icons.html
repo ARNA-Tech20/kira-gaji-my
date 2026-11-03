@@ -1,0 +1,52 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:transparent;font-family:Inter,sans-serif;display:flex;flex-wrap:wrap;gap:40px;padding:20px}
+.c{width:1024px;height:1024px;position:relative;display:flex;align-items:center;justify-content:center}
+.bg{background:#0B3D2E;overflow:hidden}
+.bg .g1{position:absolute;width:900px;height:900px;border-radius:50%;background:#0F6E56;opacity:.45;right:-420px;top:-420px}
+.bg .g2{position:absolute;width:700px;height:700px;border-radius:50%;background:#1D9E75;opacity:.16;left:-360px;bottom:-360px}
+.mark{position:relative;display:flex;flex-direction:column;align-items:center}
+.rm{font-weight:800;letter-spacing:-.06em;line-height:.9;color:#ECF8F2}
+.bar{display:flex;overflow:hidden}
+.bar i{display:block;height:100%}
+/* saiz mark mengikut kanvas */
+.full .rm{font-size:420px}
+.full .bar{width:560px;height:72px;border-radius:36px;margin-top:46px}
+.safe .rm{font-size:300px}
+.safe .bar{width:400px;height:52px;border-radius:26px;margin-top:34px}
+.mono .rm{color:#FFFFFF}
+.mono .bar{background:#FFFFFF}
+.mono .bar i{background:transparent!important}
+</style></head><body>
+
+<!-- ikon penuh (Play Store 512 & ikon iOS/Expo) -->
+<div class="c bg full" id="icon"><div class="g1"></div><div class="g2"></div>
+  <div class="mark"><div class="rm">RM</div>
+    <div class="bar"><i style="width:68%;background:#2BB673"></i><i style="width:16%;background:#4C9AFF"></i><i style="width:8%;background:#F2A93B"></i><i style="width:8%;background:#F0705A"></i></div>
+  </div>
+</div>
+
+<!-- adaptive foreground: kandungan dalam zon selamat 66% -->
+<div class="c safe" id="fg">
+  <div class="mark"><div class="rm">RM</div>
+    <div class="bar"><i style="width:68%;background:#2BB673"></i><i style="width:16%;background:#4C9AFF"></i><i style="width:8%;background:#F2A93B"></i><i style="width:8%;background:#F0705A"></i></div>
+  </div>
+</div>
+
+<!-- adaptive background -->
+<div class="c bg" id="bgimg"><div class="g1"></div><div class="g2"></div></div>
+
+<!-- monokrom (ikon bertema Android 13+) -->
+<div class="c safe mono" id="mono">
+  <div class="mark"><div class="rm">RM</div><div class="bar"></div></div>
+</div>
+
+<!-- splash: mark sahaja, latar lutsinar -->
+<div class="c full" id="splash">
+  <div class="mark"><div class="rm">RM</div>
+    <div class="bar"><i style="width:68%;background:#2BB673"></i><i style="width:16%;background:#4C9AFF"></i><i style="width:8%;background:#F2A93B"></i><i style="width:8%;background:#F0705A"></i></div>
+  </div>
+</div>
+</body></html>

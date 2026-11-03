@@ -1,0 +1,149 @@
+<title>Dasar Privasi Kira Gaji MY</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Layout: satu lajur dokumen ~65 aksara; jalur tajuk hijau gelap sama seperti app; ringkasan dalam bentuk senarai semak */
+:root{
+  --bg:#F2F5F3; --surface:#FFFFFF; --fg:#13201A; --muted:#55665D; --line:#DCE4DF;
+  --band:#0B3D2E; --band-fg:#ECF8F2; --band-muted:#9FD4BE; --accent:#0F6E56; --accent-soft:#E1F5EE;
+  --f-display:"Manrope",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Source Sans 3",ui-sans-serif,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0A0F0D; --surface:#131A17; --fg:#E6EEE9; --muted:#97A79E; --line:#24302A;
+  --band:#0F4A37; --band-fg:#ECF8F2; --band-muted:#9FD4BE; --accent:#5DCAA5; --accent-soft:#123528; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A0F0D; --surface:#131A17; --fg:#E6EEE9; --muted:#97A79E; --line:#24302A;
+  --band:#0F4A37; --band-fg:#ECF8F2; --band-muted:#9FD4BE; --accent:#5DCAA5; --accent-soft:#123528; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:17px;line-height:1.65}
+.wrap{max-width:44rem;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{background:var(--band);color:var(--band-fg)}
+header .wrap{padding-block:2.75rem 2.25rem;display:flex;flex-direction:column;gap:.6rem}
+.mark{display:inline-flex;align-items:center;gap:.6rem;font-family:var(--f-display);font-weight:800;font-size:.95rem;color:var(--band-muted);letter-spacing:.02em}
+.mark b{display:inline-grid;place-items:center;width:2rem;height:2rem;border-radius:.55rem;background:#2BB673;color:#04342C;font-size:.8rem;letter-spacing:-.04em}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(1.9rem,5vw,2.6rem);line-height:1.1;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.meta{color:var(--band-muted);font-size:.95rem;margin:0}
+main .wrap{padding-block:2rem 3.5rem;display:flex;flex-direction:column;gap:2rem}
+.summary{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1.25rem 1.4rem}
+.summary h2{margin-top:0}
+.checks{list-style:none;padding:0;margin:.5rem 0 0;display:grid;gap:.55rem}
+.checks li{display:grid;grid-template-columns:1.4rem 1fr;gap:.6rem;align-items:start}
+.checks li::before{content:"";width:1.15rem;height:1.15rem;margin-top:.3rem;border-radius:50%;background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
+h2{font-family:var(--f-display);font-weight:800;font-size:1.25rem;letter-spacing:-.01em;margin:0 0 .4rem;text-wrap:balance}
+section p{margin:.4rem 0}
+section ul{margin:.4rem 0;padding-left:1.2rem}
+table{width:100%;border-collapse:collapse;font-size:.95rem;min-width:30rem}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+th,td{text-align:left;padding:.65rem .85rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-display);font-weight:600;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:none}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+.contact{background:var(--accent-soft);border-radius:12px;padding:1rem 1.2rem}
+.contact code{font-size:1rem;user-select:all}
+hr{border:none;border-top:1px solid var(--line);margin:0}
+.en h2{font-size:1.1rem}
+.en{color:var(--muted)}
+.en p{margin:.4rem 0}
+</style>
+
+<header>
+  <div class="wrap">
+    <span class="mark"><b>RM</b>Kira Gaji MY</span>
+    <h1>Dasar Privasi</h1>
+    <p class="meta">Berkuat kuasa 3 November 2026 · Versi app 1.7</p>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="summary">
+      <h2>Ringkasan</h2>
+      <ul class="checks">
+        <li>Anda tidak perlu mendaftar akaun.</li>
+        <li>Semua angka yang anda masukkan (gaji, pelepasan, zakat) disimpan dalam telefon anda sahaja.</li>
+        <li>Kami tidak menerima, menjual atau berkongsi data yang anda masukkan.</li>
+        <li>App memaparkan iklan Google AdMob. Google mungkin mengumpul pengecam peranti untuk tujuan iklan.</li>
+      </ul>
+    </div>
+
+    <section>
+      <h2>1. Siapa kami</h2>
+      <p>Kira Gaji MY ialah aplikasi bebas yang dibangunkan oleh seorang pembangun individu di Malaysia. App ini tidak berkaitan dengan LHDN, KWSP, PERKESO atau mana-mana pusat zakat negeri.</p>
+    </section>
+
+    <section>
+      <h2>2. Data yang anda masukkan</h2>
+      <p>App menyimpan input anda dalam storan setempat telefon supaya anda tidak perlu menaip semula setiap kali membuka app:</p>
+      <ul>
+        <li>Gaji kasar, bonus dan PCB yang sudah dipotong</li>
+        <li>Pilihan umur, LINDUNG 24 Jam dan negeri</li>
+        <li>Amaun pelepasan cukai, bilangan anak dan tanggungan</li>
+        <li>Nisab dan zakat yang dibayar</li>
+      </ul>
+      <p>Data ini tidak dihantar ke pelayan kami. Kami tidak mempunyai pelayan untuk menerimanya.</p>
+    </section>
+
+    <section>
+      <h2>3. Iklan</h2>
+      <p>Versi percuma memaparkan iklan banner daripada Google AdMob. App meminta iklan tidak diperibadikan, tetapi Google mungkin tetap memproses maklumat berikut untuk menghantar iklan, mengukur prestasi dan mencegah penipuan:</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Maklumat</th><th>Dikumpul oleh</th><th>Tujuan</th></tr></thead>
+          <tbody>
+            <tr><td>ID pengiklanan peranti</td><td>Google AdMob</td><td>Penghantaran dan pengukuran iklan</td></tr>
+            <tr><td>Alamat IP dan anggaran lokasi</td><td>Google AdMob</td><td>Iklan sesuai wilayah, pencegahan penipuan</td></tr>
+            <tr><td>Interaksi dengan iklan</td><td>Google AdMob</td><td>Laporan prestasi iklan</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Penggunaan data oleh Google tertakluk kepada <a href="https://policies.google.com/technologies/partner-sites">cara Google menggunakan maklumat daripada app rakan kongsi</a>. Anda boleh menetapkan semula atau memadam ID pengiklanan dalam Tetapan Android → Google → Iklan.</p>
+    </section>
+
+    <section>
+      <h2>4. Kongsi sebagai gambar</h2>
+      <p>Butang "Kongsi gambar" menghasilkan gambar kad gaji dalam telefon anda, kemudian membuka helaian kongsi Android. Gambar hanya dihantar ke aplikasi yang anda pilih sendiri.</p>
+    </section>
+
+    <section>
+      <h2>5. Kebenaran telefon</h2>
+      <p>App tidak meminta akses kepada kenalan, kamera, mikrofon, lokasi tepat atau fail anda. Akses internet digunakan untuk memuatkan iklan sahaja; semua kiraan berfungsi tanpa internet.</p>
+    </section>
+
+    <section>
+      <h2>6. Memadam data anda</h2>
+      <p>Tekan butang set semula di tab Gaji untuk memadam profil yang disimpan, atau nyahpasang app untuk memadam semua data setempat.</p>
+    </section>
+
+    <section>
+      <h2>7. Kanak-kanak</h2>
+      <p>App ini ditujukan kepada pekerja dewasa dan tidak direka untuk kanak-kanak bawah 13 tahun.</p>
+    </section>
+
+    <section>
+      <h2>8. Ketepatan maklumat</h2>
+      <p>Semua kiraan ialah anggaran berdasarkan kadar rasmi yang disemak pada tarikh yang dipaparkan dalam app. Ia bukan nasihat cukai, kewangan atau agama. PCB sebenar dikira oleh majikan, dan untuk kepastian zakat sila rujuk pusat zakat negeri anda.</p>
+    </section>
+
+    <section>
+      <h2>9. Perubahan dasar</h2>
+      <p>Jika dasar ini berubah, tarikh berkuat kuasa di atas akan dikemas kini dan perubahan penting akan dinyatakan dalam nota keluaran app.</p>
+    </section>
+
+    <section>
+      <h2>10. Hubungi kami</h2>
+      <div class="contact">
+        <p>Soalan atau permintaan berkaitan privasi: <code>[emel sokongan]</code></p>
+      </div>
+    </section>
+
+    <hr>
+
+    <section class="en" lang="en">
+      <h2>English summary</h2>
+      <p>Kira Gaji MY requires no account. Everything you enter is stored only on your device and is never sent to us. The free version shows Google AdMob banner ads; Google may process your advertising ID, IP address and ad interactions as described in Google's partner policy. Shared images go only to the app you choose. You can clear your data with the reset button or by uninstalling the app. The app is not directed at children under 13 and is not affiliated with LHDN, KWSP, PERKESO or any state zakat authority.</p>
+    </section>
+  </div>
+</main>

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#222;padding:20px;display:flex;flex-wrap:wrap;gap:20px;-webkit-font-smoothing:antialiased}
+.shot{width:360px;height:640px;background:#0B3D2E;position:relative;overflow:hidden;color:#ECF8F2}
+.shot .glow{position:absolute;width:420px;height:420px;border-radius:50%;background:#0F6E56;opacity:.35;right:-170px;top:-160px}
+.shot .glow2{position:absolute;width:300px;height:300px;border-radius:50%;background:#1D9E75;opacity:.18;left:-140px;top:250px}
+.cap{position:relative;padding:44px 30px 0}
+.kick{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.2px;color:#0B3D2E;background:#9FE1CB;padding:5px 10px;border-radius:999px}
+.h{font-size:31px;line-height:1.12;font-weight:800;letter-spacing:-.8px;margin-top:14px}
+.h em{font-style:normal;color:#5DCAA5}
+.sub{font-size:14px;line-height:1.45;color:#B8E2D1;margin-top:10px;font-weight:500}
+.fine{position:absolute;left:0;right:0;bottom:0;height:28px;display:flex;align-items:center;justify-content:center;background:#06261C;font-size:8.5px;color:#9FD4BE;letter-spacing:.2px;z-index:3}
+.phone{position:absolute;left:38px;right:38px;top:236px;height:440px;background:#F2F5F3;border:7px solid #052219;border-bottom:none;border-radius:36px 36px 0 0;padding:16px 12px 0;overflow:hidden;color:#0E1A14}
+.notch{width:70px;height:16px;border-radius:10px;background:#052219;margin:-8px auto 10px}
+.ah{display:flex;align-items:center;margin-bottom:9px}
+.at{font-size:17px;font-weight:800;letter-spacing:-.4px;flex:1}
+.as{font-size:7.5px;color:#5B6B62;font-weight:500}
+.bd{font-size:7.5px;font-weight:700;color:#0F6E56;background:#E1F5EE;padding:3px 7px;border-radius:999px}
+.hp{width:20px;height:20px;border-radius:10px;background:#E1F5EE;color:#0F6E56;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-left:5px}
+.tabs{display:flex;background:#fff;border:1px solid #E2E8E4;border-radius:10px;padding:3px;margin-bottom:9px}
+.tab{flex:1;text-align:center;font-size:9px;font-weight:700;color:#5B6B62;padding:6px 0;border-radius:7px}
+.tab.on{background:#0F6E56;color:#fff}
+.lbl{font-size:8px;color:#5B6B62;font-weight:600;margin-bottom:4px}
+.in{background:#fff;border:1.5px solid #E2E8E4;border-radius:10px;padding:7px 10px;font-size:13px;font-weight:700;margin-bottom:8px}
+.in span{font-size:10px;color:#5B6B62;margin-right:5px}
+.in.focus{border-color:#1D9E75}
+.hero{background:#0B3D2E;border-radius:16px;padding:13px;margin-bottom:8px;color:#ECF8F2}
+.hl{font-size:8.5px;color:#9FD4BE;font-weight:600}
+.hv{font-size:26px;font-weight:800;letter-spacing:-.8px;margin-top:1px}
+.hs{font-size:8px;color:#9FD4BE;margin-top:2px}
+.bar{display:flex;height:7px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,.14);margin-top:10px}
+.lg{display:flex;flex-wrap:wrap;gap:3px 9px;margin-top:7px;font-size:7.5px;color:#9FD4BE}
+.lg b{color:#ECF8F2;font-weight:700}
+.dot{display:inline-block;width:6px;height:6px;border-radius:3px;margin-right:3px;vertical-align:0}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chip{background:rgba(255,255,255,.14);font-size:7.5px;font-weight:700;padding:3px 7px;border-radius:999px}
+.chip.g{background:#2BB673;color:#04342C}
+.card{background:#fff;border:1px solid #E2E8E4;border-radius:13px;padding:9px 11px;margin-bottom:8px}
+.ct{font-size:10px;font-weight:800;margin-bottom:3px}
+.r{display:flex;justify-content:space-between;font-size:9px;padding:3.5px 0}
+.r span:first-child{color:#5B6B62}
+.r span:last-child{font-weight:600}
+.r.t{border-top:1px solid #E2E8E4;margin-top:3px;padding-top:6px}
+.r.t span{color:#0E1A14!important;font-weight:800}
+.sec{display:flex;align-items:center;gap:5px;font-size:7.5px;font-weight:800;letter-spacing:.6px;color:#5B6B62;margin:9px 0 6px}
+.sec::after{content:"";flex:1;height:1px;background:#E2E8E4}
+.tg{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #E2E8E4;border-radius:10px;padding:6px 9px;margin-bottom:7px;font-size:9px;font-weight:600}
+.sw{width:24px;height:14px;border-radius:7px;background:#0F6E56;position:relative;margin-left:auto}
+.sw::after{content:"";position:absolute;right:2px;top:2px;width:10px;height:10px;border-radius:5px;background:#fff}
+.ib{width:18px;height:18px;border-radius:9px;background:#E1F5EE;display:flex;align-items:center;justify-content:center}
+.ib i{width:7px;height:7px;border-radius:2px;background:#0F6E56;display:block}
+.grp{display:flex;align-items:center;gap:7px;padding:6px 0;border-top:1px solid #E2E8E4;font-size:9px;font-weight:600}
+.grp:first-of-type{border-top:none}
+.gi{width:18px;height:18px;border-radius:9px;background:#E1F5EE}
+.gi.on{background:#0F6E56}
+.gv{margin-left:auto;color:#0F6E56;font-weight:800;font-size:8.5px}
+.good{display:flex;gap:8px;align-items:center;background:#E3F6EC;color:#0B5A3C;border-radius:13px;padding:9px 11px;margin-bottom:8px}
+.ck{width:20px;height:20px;border-radius:10px;border:2px solid #0B5A3C;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.states{display:flex;gap:5px;margin-bottom:8px;overflow:hidden}
+.st{flex-shrink:0;font-size:8.5px;font-weight:700;padding:5px 9px;border-radius:999px;background:#fff;border:1px solid #E2E8E4;display:flex;align-items:center;gap:4px}
+.st.on{background:#0F6E56;color:#fff;border-color:#0F6E56}
+.st .d{width:5px;height:5px;border-radius:3px;background:#2BB673}.st.on .d{background:#fff}
+.mc{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:6px}
+.m{border:1.5px solid #E2E8E4;background:#fff;border-radius:13px;padding:9px}
+.m.on{border-color:#0F6E56;background:#E1F5EE}
+.mt{font-size:8.5px;font-weight:800;display:flex;align-items:center;gap:4px}
+.m.on .mt{color:#0F6E56}
+.rad{width:9px;height:9px;border-radius:5px;border:1.5px solid #93A39A}
+.m.on .rad{border-color:#0F6E56;background:radial-gradient(#0F6E56 40%,transparent 45%)}
+.mv{font-size:15px;font-weight:800;margin-top:5px;letter-spacing:-.3px}
+.ms{font-size:7px;color:#5B6B62;margin-top:1px}
+.note{font-size:7.5px;color:#5B6B62;text-align:center;margin-bottom:6px}
+.step{display:flex;align-items:center;gap:6px;background:#F2F5F3;border-radius:9px;padding:5px 8px;font-size:8.5px;font-weight:600;margin-bottom:5px}
+.sb{width:18px;height:18px;border-radius:9px;background:#E1F5EE;color:#0F6E56;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+.sn{width:14px;text-align:center;font-weight:800}
+
+/* feature graphic */
+.fg{width:512px;height:250px;background:#0B3D2E;position:relative;overflow:hidden;color:#ECF8F2;display:flex;align-items:center;padding:0 30px}
+.fg .glow{right:-120px;top:-210px}
+.fg .brand{position:relative;flex:1}
+.fg .logo{width:44px;height:44px;border-radius:12px;background:#2BB673;color:#04342C;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;letter-spacing:-1px}
+.fg .name{font-size:30px;font-weight:800;letter-spacing:-.9px;margin-top:12px}
+.fg .tag{font-size:13px;color:#B8E2D1;margin-top:5px;font-weight:500;line-height:1.4}
+.fg .stack{position:relative;width:190px}
+.fg .mini{background:#F2F5F3;color:#0E1A14;border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.fg .mini .l{font-size:8px;color:#5B6B62;font-weight:600}
+.fg .mini .v{font-size:18px;font-weight:800;letter-spacing:-.5px}
+.fg .mini.dk{background:#0F4A37;color:#ECF8F2;border:1px solid #1D9E75}
+.fg .mini.dk .l{color:#9FD4BE}
+</style>
+</head>
+<body>
+
+<!-- 1. GAJI -->
+<div class="shot" id="s1">
+  <div class="glow"></div><div class="glow2"></div>
+  <div class="cap">
+    <span class="kick">GAJI BERSIH</span>
+    <div class="h">Tahu gaji bersih<br>anda dalam <em>3 saat</em></div>
+    <div class="sub">KWSP, PERKESO, SIP, PCB dan LINDUNG 24 Jam dikira serentak.</div>
+  </div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="ah"><div style="flex:1"><div class="at">Kira Gaji</div><div class="as">Kadar disemak 3 Nov 2026</div></div><span class="bd">TT2025 / TT2026</span><span class="hp">?</span></div>
+    <div class="tabs"><div class="tab on">Gaji</div><div class="tab">Cukai</div><div class="tab">Zakat</div></div>
+    <div class="lbl">Gaji kasar bulanan</div>
+    <div class="in focus"><span>RM</span>5000</div>
+    <div class="hero">
+      <div class="hl">Gaji bersih anggaran</div>
+      <div class="hv">RM 4,269.95</div>
+      <div class="hs">daripada RM 5,000.00 · 85% dibawa pulang</div>
+      <div class="bar"><div style="width:85.4%;background:#2BB673"></div><div style="width:11%;background:#4C9AFF"></div><div style="width:1.44%;background:#F2A93B"></div><div style="width:2.17%;background:#F0705A"></div></div>
+      <div class="lg"><span><span class="dot" style="background:#2BB673"></span>Bersih <b>RM 4,269.95</b></span><span><span class="dot" style="background:#4C9AFF"></span>KWSP <b>RM 550.00</b></span><span><span class="dot" style="background:#F2A93B"></span>PERKESO <b>RM 71.80</b></span><span><span class="dot" style="background:#F0705A"></span>PCB <b>RM 108.25</b></span></div>
+    </div>
+    <div class="card">
+      <div class="ct">Potongan bulanan</div>
+      <div class="r"><span><span class="dot" style="background:#4C9AFF"></span>KWSP (11%)</span><span>RM 550.00</span></div>
+      <div class="r"><span><span class="dot" style="background:#F2A93B"></span>PERKESO</span><span>RM 24.75</span></div>
+      <div class="r"><span><span class="dot" style="background:#F2A93B"></span>SIP</span><span>RM 9.90</span></div>
+      <div class="r"><span><span class="dot" style="background:#F2A93B"></span>LINDUNG 24 Jam</span><span>RM 37.15</span></div>
+      <div class="r"><span><span class="dot" style="background:#F0705A"></span>PCB (anggaran)</span><span>RM 108.25</span></div>
+      <div class="r t"><span>Jumlah potongan</span><span>RM 730.05</span></div>
+    </div>
+  </div>
+  <div class="fine">Anggaran sahaja · App bebas, bukan app rasmi LHDN, KWSP atau PERKESO</div>
+</div>
+
+<!-- 2. CUKAI -->
+<div class="shot" id="s2">
+  <div class="glow"></div><div class="glow2"></div>
+  <div class="cap">
+    <span class="kick">CUKAI PENDAPATAN</span>
+    <div class="h">Jimat cukai dengan<br><em>19 pelepasan</em> LHDN</div>
+    <div class="sub">Lihat terus sama ada anda dapat bayaran balik atau perlu bayar lagi.</div>
+  </div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="tabs"><div class="tab">Gaji</div><div class="tab on">Cukai</div><div class="tab">Zakat</div></div>
+    <div class="hero">
+      <div class="hl">Cukai setahun anggaran</div>
+      <div class="hv">RM 1,758.50</div>
+      <div class="chips"><span class="chip">≈ RM 146.54/bulan</span><span class="chip g">Jimat RM 693.00</span></div>
+    </div>
+    <div class="good"><div class="ck">✓</div><div><div style="font-size:8.5px;font-weight:700">Anggaran bayaran balik</div><div style="font-size:16px;font-weight:800">RM 1,841.50</div></div></div>
+    <div class="sec">PELEPASAN</div>
+    <div class="card" style="padding:4px 11px">
+      <div class="grp"><span class="gi"></span>Keluarga &amp; anak</div>
+      <div class="grp"><span class="gi on"></span>Perubatan<span class="gv">RM 3,000.00</span></div>
+      <div class="grp"><span class="gi on"></span>Gaya hidup<span class="gv">RM 3,300.00</span></div>
+      <div class="grp"><span class="gi"></span>Pendidikan &amp; simpanan</div>
+      <div class="grp"><span class="gi"></span>Insurans &amp; persaraan</div>
+    </div>
+  </div>
+  <div class="fine">Anggaran sahaja · App bebas, bukan app rasmi LHDN, KWSP atau PERKESO</div>
+</div>
+
+<!-- 3. ZAKAT -->
+<div class="shot" id="s3">
+  <div class="glow"></div><div class="glow2"></div>
+  <div class="cap">
+    <span class="kick">ZAKAT PENDAPATAN</span>
+    <div class="h">Banding zakat<br><em>ikut negeri</em></div>
+    <div class="sub">Kaedah kasar atau bersih dengan had kifayah, terus jadi rebat cukai.</div>
+  </div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="tabs"><div class="tab">Gaji</div><div class="tab">Cukai</div><div class="tab on">Zakat</div></div>
+    <div class="hero">
+      <div class="hl">Zakat setahun · kaedah bersih</div>
+      <div class="hv">RM 869.10</div>
+      <div class="chips"><span class="chip">Asas RM 34,764.00</span><span class="chip">≈ RM 72.43/bulan</span></div>
+    </div>
+    <div class="states"><span class="st on"><span class="d"></span>WP</span><span class="st"><span class="d"></span>Selangor</span><span class="st">Johor</span><span class="st">N. Sembilan</span><span class="st">Sabah</span></div>
+    <div class="mc">
+      <div class="m"><div class="mt"><span class="rad"></span>Kaedah kasar</div><div class="mv">RM 1,800.00</div><div class="ms">Tanpa tolakan</div></div>
+      <div class="m on"><div class="mt"><span class="rad"></span>Kaedah bersih</div><div class="mv">RM 869.10</div><div class="ms">Selepas had kifayah</div></div>
+    </div>
+    <div class="note">Kaedah bersih RM 930.90 lebih rendah setahun</div>
+    <div class="card">
+      <div class="ct">Had kifayah (tolakan)</div>
+      <div class="step"><span style="flex:1">Tanggungan dewasa 18+</span><span class="sb">−</span><span class="sn">1</span><span class="sb">+</span></div>
+      <div class="step"><span style="flex:1">Anak 7–17 tahun</span><span class="sb">−</span><span class="sn">2</span><span class="sb">+</span></div>
+    </div>
+  </div>
+  <div class="fine">Anggaran sahaja · Rujuk pusat zakat negeri anda untuk kepastian</div>
+</div>
+
+<!-- FEATURE GRAPHIC -->
+<div class="fg" id="fg">
+  <div class="glow" style="position:absolute;width:420px;height:420px;border-radius:50%;background:#0F6E56;opacity:.35"></div>
+  <div class="brand">
+    <div class="logo">RM</div>
+    <div class="name">Kira Gaji MY</div>
+    <div class="tag">Gaji bersih, cukai &amp; zakat<br>dalam satu app. Offline, BM.</div>
+  </div>
+  <div class="stack">
+    <div class="mini dk"><div class="l">Gaji bersih anggaran</div><div class="v">RM 4,269.95</div></div>
+    <div class="mini"><div class="l">Bayaran balik cukai</div><div class="v" style="color:#0B5A3C">RM 1,841.50</div></div>
+    <div class="mini" style="margin-bottom:0"><div class="l">Zakat setahun</div><div class="v">RM 869.10</div></div>
+  </div>
+</div>
+
+</body>
+</html>

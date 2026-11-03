@@ -1,0 +1,26 @@
+# kebergantungan & binaan
+node_modules/
+.expo/
+dist/
+dist-android/
+web-build/
+android/
+ios/
+
+# kunci tandatangan & rahsia — JANGAN commit
+*.keystore
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+credentials.json
+google-services.json
+service-account*.json
+.env
+.env.*
+
+# sistem
+.DS_Store
+*.log
+npm-debug.*
