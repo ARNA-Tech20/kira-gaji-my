@@ -1,0 +1,31 @@
+# Ujian automatik setiap push dan pull request
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Ujian logik kiraan
+        run: npm run test:logic
+      - name: ESLint
+        run: npm run lint
+      - name: Ujian render UI
+        run: npx jest --ci
+      - name: Bundle Android
+        run: npx expo export --platform android --output-dir dist-android

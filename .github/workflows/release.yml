@@ -1,0 +1,38 @@
+# Keluaran automatik: tolak tag v1.9.0 (contoh) untuk bina AAB dan hantar ke Play Console
+# Rahsia diperlukan: EXPO_TOKEN (expo.dev → Account settings → Access tokens)
+# Kunci akaun perkhidmatan Google dimuat naik sekali ke EAS: eas credentials → Android → Google Service Account
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Ujian sebelum bina
+        run: |
+          npm run test:logic
+          npm run lint
+          npx jest --ci
+      - name: Semak versi tag sama dengan app.json
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          APP=$(node -p "require('./app.json').expo.version")
+          if [ "$TAG" != "$APP" ]; then echo "Tag v$TAG tidak sama dengan app.json $APP"; exit 1; fi
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Bina AAB dan hantar ke Play Console (draf)
+        run: eas build --platform android --profile production --non-interactive --no-wait --auto-submit

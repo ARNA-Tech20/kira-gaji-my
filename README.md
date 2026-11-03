@@ -5,9 +5,9 @@ Kalkulator gaji bersih, cukai pendapatan dan zakat pendapatan untuk pekerja Mala
 ## 1. Cara jalankan
 
 ```bash
-npx create-expo-app@latest kira-gaji --template blank
-cd kira-gaji
-# salin App.js, folder src/ dan tests/ dari pakej ini ke dalam projek (ganti App.js asal)
+git clone https://github.com/ARNA-Tech20/kira-gaji-my.git
+cd kira-gaji-my
+npm install
 npx expo start
 ```
 
@@ -109,3 +109,17 @@ Untuk ujian UI: `npm i -D jest jest-expo @testing-library/react-native` dan tamb
 | `store/icon-512.png` | Ikon Play Console |
 
 Splash natif ditahan sehingga profil dimuat, kemudian `src/ui/Splash.js` memaparkan nama app sekejap dan pudar ke dalam app (~0.9 saat). Untuk tukar logo, ganti fail di atas dan kekalkan saiz yang sama.
+
+## 10. Automasi
+
+| Komponen | Bila berjalan | Apa dibuat |
+|---|---|---|
+| `.github/workflows/ci.yml` | Setiap push ke `main` dan pull request | Ujian logik, ESLint, ujian UI, bundle Android |
+| `.github/workflows/release.yml` | Bila tag `v*` ditolak (cth. `v1.9.0`) | Ujian, semak tag = `app.json`, EAS build AAB, hantar draf ke ujian tertutup |
+| Tugas berjadual "Semak kadar Kira Gaji" | 20 Jan, Mac, Jul, Okt, 8:41 pagi | Semak kadar rasmi dan lapor perubahan |
+| Skill `penerbit-kira-gaji` | Bila diminta ("terbit versi baharu") | Kemas kini kadar, uji, tag dan keluarkan |
+
+Persediaan sekali sahaja untuk `release.yml`:
+1. Cipta token di expo.dev → Account settings → Access tokens, simpan sebagai rahsia repo `EXPO_TOKEN`.
+2. Cipta akaun perkhidmatan Google dengan akses Play Console, muat naik kuncinya: `eas credentials` → Android → Google Service Account.
+3. Keluaran pertama tetap dimuat naik secara manual di Play Console.
