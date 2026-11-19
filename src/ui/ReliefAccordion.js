@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Animated, View, Text, Pressable, StyleSheet, LayoutAnimation, Platform, UIManager, useAnimatedValue } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { RELIEF_GROUPS, RELIEFS, catalogClaims } from '../calc/reliefs';
-import { MoneyField, Stepper, ToggleRow } from './components';
+import { MoneyField, Stepper, ToggleRow, LockedField } from './components';
 import { rm } from './theme';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -23,7 +23,7 @@ function Chevron({ open, color }) {
 }
 
 // Senarai pelepasan dikumpul ikut kumpulan; setiap kumpulan boleh dibuka/ditutup
-export default function ReliefAccordion({ values = {}, onChange, t }) {
+export default function ReliefAccordion({ values = {}, onChange, t, locked = {}, onOpenReceipts }) {
   const [open, setOpen] = useState(null);
   const { byGroup, total } = catalogClaims(values);
   const set = (key) => (v) => onChange({ ...values, [key]: v });
@@ -41,7 +41,7 @@ export default function ReliefAccordion({ values = {}, onChange, t }) {
           <Text style={{ color: t.accent, fontSize: 12, fontWeight: '700' }}>{rm(total)}</Text>
         </View>
       </View>
-      <Text style={{ color: t.muted, fontSize: 12, marginBottom: 8 }}>Buka kumpulan yang berkaitan dan isi yang ada resit sahaja.</Text>
+      <Text style={{ color: t.muted, fontSize: 12, marginBottom: 8 }}>Isi yang ada resit sahaja. Kategori yang ada resit dalam tab Resit diisi automatik.</Text>
 
       {RELIEF_GROUPS.map((g, i) => {
         const isOpen = open === g.key;
@@ -67,7 +67,10 @@ export default function ReliefAccordion({ values = {}, onChange, t }) {
               <View style={{ paddingBottom: 8 }}>
                 {RELIEFS.filter((r) => r.group === g.key).map((r) => (
                   <View key={r.key}>
-                    {r.type === 'amount' && (
+                    {r.type === 'amount' && locked[r.key] && (
+                      <LockedField label={r.label} total={locked[r.key].total} count={locked[r.key].count} onPress={() => onOpenReceipts?.(r.key)} t={t} />
+                    )}
+                    {r.type === 'amount' && !locked[r.key] && (
                       <MoneyField label={r.label} value={values[r.key] ?? ''} onChange={set(r.key)} placeholder="0" t={t} />
                     )}
                     {r.type === 'count' && (

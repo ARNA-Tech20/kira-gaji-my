@@ -14,7 +14,7 @@ npx expo start
 ### v1.1: pakej tambahan
 
 ```bash
-npx expo install @react-native-async-storage/async-storage react-native-view-shot expo-sharing react-native-safe-area-context expo-asset expo-font expo-splash-screen expo-system-ui react-native-google-mobile-ads expo-dev-client
+npx expo install @react-native-async-storage/async-storage react-native-view-shot expo-sharing react-native-safe-area-context expo-asset expo-font expo-splash-screen expo-system-ui react-native-google-mobile-ads expo-dev-client expo-image-picker expo-file-system expo-print expo-image-manipulator
 # salin app.json dari pakej ini (atau gabungkan bahagian "plugins")
 npx expo run:android   # AdMob perlukan development build; Expo Go akan sembunyikan iklan
 ```
@@ -37,7 +37,11 @@ node --test tests/calc.test.mjs
 | `src/calc/payroll.js` | KWSP, PERKESO, SIP, LINDUNG 24 Jam, gaji bersih |
 | `src/calc/tax.js` | Pelepasan, pendapatan bercukai, cukai progresif, rebat RM400, rebat zakat |
 | `src/calc/zakat.js` | Zakat pendapatan (kaedah kasar/bersih, nisab dimasukkan pengguna) |
-| `App.js` | 3 tab: Gaji Bersih, Cukai, Zakat. Mod gelap automatik |
+| `src/calc/receipts.js` | Folder resit ikut kategori, jumlah ikut tahun, had, gabung ke kiraan cukai |
+| `src/receiptStore.js` | Simpan resit: metadata AsyncStorage, gambar `documentDirectory/resit/<kategori>/` |
+| `src/pdf/receiptsHtml.js` · `receiptsPdf.js` | HTML A4 (ringkasan + 4 resit/halaman) → expo-print → kongsi |
+| `src/ui/ReceiptsTab.js` | Tab Resit: folder, senarai, borang tambah, pemapar gambar |
+| `App.js` | 4 tab: Gaji, Cukai, Resit, Zakat. Mod gelap automatik |
 | `tests/calc.test.mjs` | 7 ujian berbanding jadual rasmi |
 
 ## 3. Kadar yang digunakan (disemak 3 Nov 2026)
@@ -90,10 +94,10 @@ node --test tests/calc.test.mjs
 
 | Ujian | Arahan | Keputusan terakhir |
 |---|---|---|
-| Logik kiraan | `node --test tests/calc.test.mjs` | 14/14 lulus |
+| Logik kiraan + resit + PDF | `npm run test:logic` | 21/21 lulus |
 | ESLint (eslint-config-expo) | `npx eslint App.js src` | 0 ralat, 0 amaran |
 | Bundle Android | `npx expo export --platform android` | Berjaya |
-| Render UI (jest-expo + RTL 14) | `npx jest tests/app.ui.test.js` | 14/14 lulus |
+| Render UI (jest-expo + RTL 14) | `npx jest tests/app.ui.test.js` | 19/19 lulus |
 | Prebuild Android (ikon, splash, AdMob) | `npx expo prebuild --platform android --no-install` | Berjaya, tiada amaran |
 
 Untuk ujian UI: `npm i -D jest jest-expo @testing-library/react-native` dan tambah `"jest": { "preset": "jest-expo" }` dalam package.json.
@@ -123,3 +127,15 @@ Persediaan sekali sahaja untuk `release.yml`:
 1. Cipta token di expo.dev → Account settings → Access tokens, simpan sebagai rahsia repo `EXPO_TOKEN`.
 2. Cipta akaun perkhidmatan Google dengan akses Play Console, muat naik kuncinya: `eas credentials` → Android → Google Service Account.
 3. Keluaran pertama tetap dimuat naik secara manual di Play Console.
+
+## 11. Resit (v1.10)
+
+| Ciri | Cara |
+|---|---|
+| Tambah | Kamera atau galeri → kategori → tarikh → jumlah → catatan. Gambar dikecilkan ke 1200px JPEG |
+| Folder | 13 pelepasan jenis amaun + insurans hayat + zakat. Bar kemajuan berbanding had |
+| Kiraan cukai | Jumlah resit tahun dipilih mengatasi nilai manual; medan jadi "Dari N resit" (tekan untuk buka folder) |
+| PDF | A4, halaman 1 ringkasan (resit, jumlah, had, dituntut), kemudian 4 resit/halaman ikut kategori. Semua atau satu folder |
+| Privasi | Gambar dalam storan peribadi app sahaja. Kebenaran kamera/galeri diminta bila ditekan. Mikrofon disekat |
+
+Had diketahui: resit hilang jika app dinyahpasang (pengguna dinasihatkan simpan PDF). Belum ada sandaran awan atau OCR.

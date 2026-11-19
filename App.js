@@ -9,22 +9,26 @@ import { annualTax } from './src/calc/tax';
 import { zakatCompare } from './src/calc/zakat';
 import { RATES } from './src/calc/rates';
 import { DEFAULT_PROFILE, loadProfile, saveProfileDebounced, resetProfile } from './src/storage';
+import { loadReceipts } from './src/receiptStore';
+import { mergeReceiptInputs } from './src/calc/receipts';
 import { shareCard } from './src/share';
 import AdBanner from './src/components/AdBanner';
 
 import { THEMES, SEG, rm, num, fmtDate } from './src/ui/theme';
 import { AnimatedNumber, FadeIn, PressableScale } from './src/ui/motion';
 import {
-  TabBar, MoneyField, ToggleRow, Stepper, Segmented, Card, Row, BreakdownBar, Legend, HelpSheet, StatusBanner, SectionHeader,
+  TabBar, MoneyField, LockedField, ToggleRow, Stepper, Segmented, Card, Row, BreakdownBar, Legend, HelpSheet, StatusBanner, SectionHeader,
 } from './src/ui/components';
 import { HELP } from './src/ui/help';
 import ReliefAccordion from './src/ui/ReliefAccordion';
+import ReceiptsTab from './src/ui/ReceiptsTab';
 import AnimatedSplash from './src/ui/Splash';
 import { StatePicker, StateSourceNote, MethodCompare, HadKifayahForm } from './src/ui/ZakatPanel';
 
 const TABS = [
   { key: 'gaji', label: 'Gaji', icon: 'wallet-outline' },
-  { key: 'cukai', label: 'Cukai', icon: 'receipt-outline' },
+  { key: 'cukai', label: 'Cukai', icon: 'calculator-outline' },
+  { key: 'resit', label: 'Resit', icon: 'receipt-outline' },
   { key: 'zakat', label: 'Zakat', icon: 'leaf-outline' },
 ];
 
@@ -49,12 +53,16 @@ function Main({ onReady }) {
   const [toast, setToast] = useState('');
   const [helpOpen, setHelpOpen] = useState(false);
   const [showReliefs, setShowReliefs] = useState(false);
+  const [receipts, setReceipts] = useState([]);
+  const [receiptYear, setReceiptYear] = useState(new Date().getFullYear());
+  const [folder, setFolder] = useState(null);
   const shareRef = useRef(null);
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    loadProfile().then((p) => {
+    Promise.all([loadProfile(), loadReceipts()]).then(([p, list]) => {
       setProfile(p);
+      setReceipts(list);
       setLoaded(true);
       onReady && onReady();
     });
@@ -65,6 +73,24 @@ function Main({ onReady }) {
 
   const set = (key) => (value) => setProfile((p) => ({ ...p, [key]: value }));
   const P = profile;
+  // Resit tahun dipilih mengatasi nilai manual bagi kategori yang sama
+  const M = useMemo(() => mergeReceiptInputs(P, receipts, receiptYear), [P, receipts, receiptYear]);
+  const locked = M.locked;
+  const openFolder = (key) => {
+    setFolder(key);
+    setTab('resit');
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  };
+  // Simpan pelepasan manual tanpa menimpa nilai asal dengan jumlah resit
+  const setReliefs = (v) =>
+    setProfile((p) => {
+      const next = { ...v };
+      for (const k of Object.keys(locked)) {
+        if (p.reliefs && k in p.reliefs) next[k] = p.reliefs[k];
+        else delete next[k];
+      }
+      return { ...p, reliefs: next };
+    });
 
   const tax = useMemo(
     () =>
@@ -73,13 +99,13 @@ function Main({ onReady }) {
         bonus: num(P.bonus),
         spouseNoIncome: P.spouse,
         childrenUnder18: num(P.children),
-        lifeInsurance: num(P.life),
-        reliefInputs: P.reliefs || {},
-        zakatPaid: num(P.zakatPaid),
+        lifeInsurance: num(M.life),
+        reliefInputs: M.reliefs,
+        zakatPaid: num(M.zakatPaid),
         age60: P.age60,
         pcbPaid: num(P.pcbPaid),
       }),
-    [P.gross, P.bonus, P.spouse, P.children, P.life, P.reliefs, P.zakatPaid, P.age60, P.pcbPaid]
+    [P.gross, P.bonus, P.spouse, P.children, M, P.age60, P.pcbPaid]
   );
   // Cukai tanpa pelepasan tambahan, untuk paparan "Jimat RMx"
   const saved = useMemo(() => {
@@ -88,12 +114,12 @@ function Main({ onReady }) {
       bonus: num(P.bonus),
       spouseNoIncome: P.spouse,
       childrenUnder18: num(P.children),
-      lifeInsurance: num(P.life),
-      zakatPaid: num(P.zakatPaid),
+      lifeInsurance: num(M.life),
+      zakatPaid: num(M.zakatPaid),
       age60: P.age60,
     });
     return Math.max(0, Math.round((base.taxPayable - tax.taxPayable) * 100) / 100);
-  }, [P.gross, P.bonus, P.spouse, P.children, P.life, P.zakatPaid, P.age60, tax.taxPayable]);
+  }, [P.gross, P.bonus, P.spouse, P.children, M, P.age60, tax.taxPayable]);
 
   const pay = useMemo(
     () => netSalary({ gross: num(P.gross), age60: P.age60, includeSkbbk: P.skbbk, pcb: tax.monthlyEstimate }),
@@ -138,7 +164,7 @@ function Main({ onReady }) {
     set('zakatPaid')(String(zakat.annual));
     setTab('cukai');
     scrollRef.current?.scrollTo({ y: 0, animated: true });
-    flash('Zakat dimasukkan sebagai rebat cukai');
+    flash(locked.zakat ? 'Rebat zakat ikut resit yang disimpan' : 'Zakat dimasukkan sebagai rebat cukai');
   };
 
   const s = makeStyles(t);
@@ -160,7 +186,7 @@ function Main({ onReady }) {
       </View>
 
       <View style={{ paddingHorizontal: 16 }}>
-        <TabBar tabs={TABS} value={tab} onChange={setTab} t={t} />
+        <TabBar tabs={TABS} value={tab} onChange={(k) => { setFolder(null); setTab(k); }} t={t} />
       </View>
 
       <ScrollView
@@ -172,9 +198,11 @@ function Main({ onReady }) {
       >
         {/* key={tab} memaksa kandungan dipasang semula supaya animasi masuk berulang setiap kali tukar tab */}
         <View key={tab}>
-          <FadeIn>
-            <MoneyField label="Gaji kasar bulanan" value={P.gross} onChange={set('gross')} t={t} />
-          </FadeIn>
+          {tab !== 'resit' && (
+            <FadeIn>
+              <MoneyField label="Gaji kasar bulanan" value={P.gross} onChange={set('gross')} t={t} />
+            </FadeIn>
+          )}
 
           {tab === 'gaji' && (
             <>
@@ -252,6 +280,11 @@ function Main({ onReady }) {
                     <View style={s.chip}>
                       <Text style={s.chipText}>Kadar efektif {tax.effectiveRate}%</Text>
                     </View>
+                    {Object.keys(locked).length > 0 && (
+                      <View style={s.chip}>
+                        <Text style={s.chipText}>Resit {receiptYear}</Text>
+                      </View>
+                    )}
                     {saved > 0 && (
                       <View style={[s.chip, { backgroundColor: SEG.net }]}>
                         <Text style={[s.chipText, { color: '#04342C' }]}>Jimat {rm(saved)}</Text>
@@ -275,11 +308,19 @@ function Main({ onReady }) {
                 <SectionHeader icon="pricetags-outline" title="Pelepasan" t={t} />
                 <ToggleRow icon="people-outline" label="Pasangan tiada pendapatan" value={P.spouse} onChange={set('spouse')} t={t} />
                 <Stepper label="Anak bawah 18 tahun" value={P.children} onChange={set('children')} t={t} />
-                <MoneyField label="Insurans hayat / takaful setahun" value={P.life} onChange={set('life')} t={t} />
-                <ReliefAccordion values={P.reliefs || {}} onChange={set('reliefs')} t={t} />
+                {locked.life ? (
+                  <LockedField label="Insurans hayat / takaful setahun" total={locked.life.total} count={locked.life.count} onPress={() => openFolder('life')} t={t} />
+                ) : (
+                  <MoneyField label="Insurans hayat / takaful setahun" value={P.life} onChange={set('life')} t={t} />
+                )}
+                <ReliefAccordion values={M.reliefs} onChange={setReliefs} locked={locked} onOpenReceipts={openFolder} t={t} />
 
                 <SectionHeader icon="receipt-outline" title="Rebat & PCB" t={t} />
-                <MoneyField label="Zakat dibayar setahun" value={P.zakatPaid} onChange={set('zakatPaid')} t={t} />
+                {locked.zakat ? (
+                  <LockedField label="Zakat dibayar setahun" total={locked.zakat.total} count={locked.zakat.count} onPress={() => openFolder('zakat')} t={t} />
+                ) : (
+                  <MoneyField label="Zakat dibayar setahun" value={P.zakatPaid} onChange={set('zakatPaid')} t={t} />
+                )}
                 <MoneyField
                   label="PCB sudah dipotong tahun ini (Borang EA / e-Data PCB)"
                   value={P.pcbPaid}
@@ -349,6 +390,20 @@ function Main({ onReady }) {
                 </Card>
               </FadeIn>
             </>
+          )}
+
+          {tab === 'resit' && (
+            <ReceiptsTab
+              receipts={receipts}
+              setReceipts={setReceipts}
+              year={receiptYear}
+              setYear={setReceiptYear}
+              folder={folder}
+              setFolder={setFolder}
+              flash={flash}
+              heroStyle={s}
+              t={t}
+            />
           )}
 
           {tab === 'zakat' && (

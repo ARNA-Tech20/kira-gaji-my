@@ -134,6 +134,28 @@ export function MoneyField({ label, value, onChange, t, placeholder, prefix = 'R
   );
 }
 
+// Medan yang diisi automatik daripada resit; tekan untuk buka folder resit
+export function LockedField({ label, total, count, onPress, t }) {
+  return (
+    <View style={{ marginBottom: 12 }}>
+      <Text style={[st.label, { color: t.muted }]}>{label}</Text>
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`${label}, ${rm(total)} dari ${count} resit`}
+        style={[st.inputWrap, { backgroundColor: t.accentSoft, borderColor: t.accentSoft, justifyContent: 'space-between' }]}
+      >
+        <Text style={[st.input, { color: t.text, flex: 0 }]}>{rm(total)}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <Ionicons name="receipt-outline" size={14} color={t.accent} />
+          <Text style={{ color: t.accent, fontSize: 12, fontWeight: '700' }}>Dari {count} resit</Text>
+          <Ionicons name="chevron-forward" size={14} color={t.accent} />
+        </View>
+      </Pressable>
+    </View>
+  );
+}
+
 export function ToggleRow({ label, hint, value, onChange, t, icon }) {
   return (
     <View style={[st.toggle, { backgroundColor: t.card, borderColor: t.line }]}>

@@ -17,7 +17,7 @@
 
 **Nama app (maks 30):** Kira Gaji: KWSP PCB Zakat MY
 
-**Keterangan pendek (maks 80):** Kira gaji bersih, KWSP, PERKESO, PCB, cukai & zakat. Offline, percuma, BM.
+**Keterangan pendek (maks 80):** Kira gaji bersih, KWSP, PCB, cukai & zakat. Simpan resit, jana PDF. BM.
 
 **Keterangan penuh:**
 
@@ -34,6 +34,13 @@ CUKAI PENDAPATAN
 • Anak 18 tahun ke atas, OKU, perubatan ibu bapa, gaya hidup, sukan, SSPN, PRS dan banyak lagi
 • Masukkan PCB yang sudah dipotong dan lihat anggaran bayaran balik atau baki perlu dibayar
 • Tunjuk berapa cukai yang anda jimat dengan pelepasan
+
+SIMPAN RESIT CUKAI
+• Ambil gambar resit dengan kamera atau pilih dari galeri
+• Folder ikut kategori pelepasan, setiap resit ada tarikh, jumlah dan catatan
+• Jumlah resit terus masuk kiraan cukai, had pelepasan dikenakan automatik
+• Jana PDF A4 semua resit atau satu kategori, sedia untuk rujukan e-Filing
+• Gambar disimpan dalam telefon anda sahaja
 
 ZAKAT PENDAPATAN
 • Pilih negeri; nisab WP dan Selangor 2026 diisi automatik
@@ -58,5 +65,5 @@ Kira Gaji MY ialah aplikasi bebas dan tidak berkaitan dengan LHDN, KWSP, PERKESO
 | Tag | Kalkulator, Cukai, Perancangan kewangan |
 | Penarafan kandungan | Semua orang |
 | Iklan | Ya (AdMob banner) |
-| Keselamatan data | Tiada data dikumpul oleh app; AdMob mengumpul ID peranti untuk iklan — isytihar mengikut panduan Google AdMob |
+| Keselamatan data | Tiada data dikumpul oleh app (gambar resit kekal dalam telefon, tidak dihantar keluar, jadi tidak perlu diisytihar sebagai "dikumpul"); AdMob mengumpul ID peranti untuk iklan — isytihar mengikut panduan Google AdMob |
 | Dasar privasi | `privacy.html` — isi `[emel sokongan]` dahulu, kemudian hos secara awam |

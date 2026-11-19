@@ -7,6 +7,9 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Sharing from 'expo-sharing';
 import * as SplashScreen from 'expo-splash-screen';
+import * as Print from 'expo-print';
+import * as FileSystem from 'expo-file-system/legacy';
+import { Alert } from 'react-native';
 import App from '../App';
 import { netSalary } from '../src/calc/payroll';
 import { annualTax } from '../src/calc/tax';
@@ -31,6 +34,33 @@ jest.mock('react-native-google-mobile-ads', () => ({
   BannerAdSize: { ANCHORED_ADAPTIVE_BANNER: 'ANCHORED_ADAPTIVE_BANNER' },
   TestIds: { ADAPTIVE_BANNER: 'test-banner' },
 }));
+
+jest.mock('expo-image-picker', () => {
+  const ok = () => Promise.resolve({ granted: true });
+  const shot = () => Promise.resolve({ canceled: false, assets: [{ uri: 'file:///tmp/cam.jpg' }] });
+  return { requestCameraPermissionsAsync: ok, requestMediaLibraryPermissionsAsync: ok, launchCameraAsync: shot, launchImageLibraryAsync: shot };
+});
+jest.mock('expo-image-manipulator', () => ({
+  SaveFormat: { JPEG: 'jpeg' },
+  ImageManipulator: {
+    manipulate: () => ({
+      resize() {
+        return this;
+      },
+      renderAsync: () => Promise.resolve({ saveAsync: () => Promise.resolve({ uri: 'file:///tmp/small.jpg' }) }),
+    }),
+  },
+}));
+jest.mock('expo-file-system/legacy', () => ({
+  documentDirectory: 'file:///doc/',
+  cacheDirectory: 'file:///cache/',
+  makeDirectoryAsync: jest.fn(() => Promise.resolve()),
+  copyAsync: jest.fn(() => Promise.resolve()),
+  moveAsync: jest.fn(() => Promise.resolve()),
+  deleteAsync: jest.fn(() => Promise.resolve()),
+  readAsStringAsync: jest.fn(() => Promise.resolve('AAAA')),
+}));
+jest.mock('expo-print', () => ({ printToFileAsync: jest.fn(() => Promise.resolve({ uri: 'file:///cache/print.pdf' })) }));
 
 // Persekitaran Node tiada pemacu animasi natif: jadikan animasi selesai serta-merta.
 // Ini hanya untuk ujian; di telefon animasi berjalan seperti biasa.
@@ -197,5 +227,87 @@ describe('Tab Zakat', () => {
     await fireEvent.press(screen.getByText('Zakat'));
     await fireEvent.press(await screen.findByLabelText('Negeri Sembilan'));
     expect(await screen.findByText(/Nisab Negeri Sembilan belum dimuatkan/)).toBeTruthy();
+  });
+});
+
+describe('Tab Resit', () => {
+  async function addLifestyleReceipt(amount) {
+    await fireEvent.press(screen.getByLabelText('Tambah resit'));
+    await fireEvent.press(await screen.findByLabelText('Ambil gambar'));
+    await waitFor(() => expect(screen.getByLabelText('Pratonton resit')).toBeTruthy());
+    await fireEvent.press(screen.getByLabelText('Gaya hidup'));
+    await fireEvent.changeText(screen.getByLabelText('Jumlah resit'), amount);
+    await fireEvent.changeText(screen.getByLabelText('Catatan'), 'Telefon');
+    await act(async () => {
+      await fireEvent.press(screen.getByLabelText('Simpan resit'));
+    });
+    await waitFor(() => expect(screen.queryByText('Resit baharu')).toBeNull());
+  }
+
+  test('folder ikut kategori dipaparkan', async () => {
+    await renderApp();
+    await fireEvent.press(screen.getByText('Resit'));
+    expect(await screen.findByText('Resit tahun ' + new Date().getFullYear())).toBeTruthy();
+    expect(screen.getByLabelText('Folder Gaya hidup, 0 resit, RM 0.00')).toBeTruthy();
+    expect(screen.getByLabelText('Folder Zakat (rebat cukai), 0 resit, RM 0.00')).toBeTruthy();
+    expect(screen.queryByLabelText('Gaji kasar bulanan')).toBeNull();
+  });
+
+  test('borang menyemak kategori dan jumlah', async () => {
+    await renderApp();
+    await fireEvent.press(screen.getByText('Resit'));
+    await fireEvent.press(await screen.findByLabelText('Tambah resit'));
+    await fireEvent.press(await screen.findByLabelText('Simpan resit'));
+    expect(await screen.findByText('Pilih kategori')).toBeTruthy();
+    expect(screen.getByText('Masukkan jumlah lebih daripada 0')).toBeTruthy();
+  });
+
+  test('resit disimpan, gambar disalin ke folder kategori dan masuk kiraan cukai', async () => {
+    await renderApp();
+    await fireEvent.changeText(screen.getByLabelText('Gaji kasar bulanan'), '8000');
+    await fireEvent.press(screen.getByText('Resit'));
+    await addLifestyleReceipt('3000');
+
+    expect(FileSystem.copyAsync).toHaveBeenCalledWith({ from: 'file:///tmp/small.jpg', to: expect.stringMatching(/^file:\/\/\/doc\/resit\/lifestyle\/.+\.jpg$/) });
+    expect(await screen.findByLabelText('Folder Gaya hidup, 1 resit, RM 3,000.00')).toBeTruthy();
+    expect(screen.getByText(/Melebihi had|dikira automatik/)).toBeTruthy();
+    const stored = JSON.parse(await AsyncStorage.getItem('kiragaji.receipts.v1'));
+    expect(stored).toHaveLength(1);
+    expect(stored[0]).toMatchObject({ category: 'lifestyle', amount: 3000, note: 'Telefon' });
+
+    await fireEvent.press(screen.getByText('Cukai'));
+    const expected = annualTax({ monthlyGross: 8000, reliefInputs: { lifestyle: '3000' } }).taxPayable;
+    await waitFor(() => expect(screen.getByLabelText(rm(expected))).toBeTruthy());
+    await fireEvent.press(screen.getByLabelText('Gaya hidup, dituntut RM 2,500.00'));
+    expect(await screen.findByText('Dari 1 resit')).toBeTruthy();
+  });
+
+  test('PDF A4 dijana dan dikongsi', async () => {
+    await renderApp();
+    await fireEvent.press(screen.getByText('Resit'));
+    await addLifestyleReceipt('120');
+    await act(async () => {
+      await fireEvent.press(screen.getByLabelText('Jana PDF semua resit'));
+    });
+    await waitFor(() => expect(Sharing.shareAsync).toHaveBeenCalled());
+    const opts = Print.printToFileAsync.mock.calls[0][0];
+    expect(opts).toMatchObject({ width: 595, height: 842 });
+    expect(opts.html).toContain('Gaya hidup');
+    expect(opts.html).toContain('data:image/jpeg;base64,AAAA');
+    expect(Sharing.shareAsync.mock.calls[0][0]).toMatch(/Resit-\d{4}-semua\.pdf$/);
+    expect(Sharing.shareAsync.mock.calls[0][1]).toMatchObject({ mimeType: 'application/pdf' });
+  });
+
+  test('resit boleh dipadam dari folder', async () => {
+    jest.spyOn(Alert, 'alert').mockImplementation((title, msg, buttons) => buttons.find((b) => b.style === 'destructive').onPress());
+    await renderApp();
+    await fireEvent.press(screen.getByText('Resit'));
+    await addLifestyleReceipt('50');
+    await fireEvent.press(await screen.findByLabelText('Folder Gaya hidup, 1 resit, RM 50.00'));
+    await act(async () => {
+      await fireEvent.press(await screen.findByLabelText('Padam resit RM 50.00'));
+    });
+    await waitFor(() => expect(FileSystem.deleteAsync).toHaveBeenCalled());
+    expect(await screen.findByText(/Belum ada resit/)).toBeTruthy();
   });
 });

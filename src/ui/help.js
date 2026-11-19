@@ -14,6 +14,20 @@ export const HELP = {
       'PCB di bawah RM10 sebulan tidak perlu dipotong.',
     ],
   },
+  resit: {
+    title: 'Cara guna: Resit',
+    steps: [
+      'Tekan "Tambah resit", ambil gambar dengan kamera atau pilih dari galeri.',
+      'Pilih kategori pelepasan, masukkan tarikh dan jumlah. Resit disimpan dalam folder kategori itu.',
+      'Jumlah resit bagi tahun dipilih terus masuk ke tab Cukai dan menggantikan nilai yang ditaip sendiri.',
+      'Tekan "PDF A4" untuk jana semua resit (atau satu folder) sebagai PDF, 4 resit setiap halaman, dengan ringkasan di halaman pertama.',
+    ],
+    notes: [
+      'Gambar disimpan dalam telefon anda sahaja dan tidak dimuat naik. Jika app dipadam, resit juga hilang, jadi simpan PDF di Google Drive atau e-mel.',
+      'Had pelepasan dikenakan automatik. Folder yang melebihi had ditanda.',
+      'LHDN boleh meminta resit asal sehingga 7 tahun selepas tahun taksiran.',
+    ],
+  },
   cukai: {
     title: 'Cara guna: Cukai tahunan',
     steps: [
