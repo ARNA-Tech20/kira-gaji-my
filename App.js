@@ -8,7 +8,13 @@ import { netSalary } from './src/calc/payroll';
 import { annualTax } from './src/calc/tax';
 import { zakatCompare } from './src/calc/zakat';
 import { RATES } from './src/calc/rates';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DEFAULT_PROFILE, loadProfile, saveProfileDebounced, resetProfile } from './src/storage';
+import { addSecondProfile, loadProfiles, saveProfiles, setActiveProfileId, usableProfiles } from './src/profiles';
+import { cachedTier, listenPurchases, loadProducts, refreshTier } from './src/billing/billing';
+import { TIER_LABEL, limitsFor } from './src/billing/plans';
+import { showRewardedAd } from './src/components/rewarded';
+import Paywall from './src/ui/Paywall';
 import { loadReceipts } from './src/receiptStore';
 import { mergeReceiptInputs } from './src/calc/receipts';
 import { shareCard } from './src/share';
@@ -56,17 +62,102 @@ function Main({ onReady }) {
   const [receipts, setReceipts] = useState([]);
   const [receiptYear, setReceiptYear] = useState(new Date().getFullYear());
   const [folder, setFolder] = useState(null);
+  const [tier, setTier] = useState('free');
+  const [products, setProducts] = useState({});
+  const [paywall, setPaywall] = useState(null); // { reason, onUnlocked }
+  const [profiles, setProfiles] = useState({ active: 'p1', list: [{ id: 'p1', name: 'Saya' }] });
+  const [pdfRewards, setPdfRewards] = useState({});
   const shareRef = useRef(null);
   const scrollRef = useRef(null);
+  const limits = limitsFor(tier);
+  const profilesRef = useRef(profiles);
+  useEffect(() => {
+    profilesRef.current = profiles;
+  }, [profiles]);
+
+  const flash = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 2200);
+  };
+
+  // Muat profil aktif dan resitnya
+  const openProfile = async (id) => {
+    setActiveProfileId(id);
+    const [p, list] = await Promise.all([loadProfile(), loadReceipts()]);
+    setProfile(p);
+    setReceipts(list);
+    setFolder(null);
+  };
+
+  // Tetapkan tier; jika Pro tamat semasa profil Pasangan dibuka, kembali ke profil pertama
+  const applyTier = (tr) => {
+    setTier(tr);
+    const cur = profilesRef.current;
+    const u = usableProfiles(cur, limitsFor(tr).profiles);
+    if (u.active !== cur.active) {
+      setProfiles({ ...cur, active: u.active });
+      openProfile(u.active);
+    }
+  };
 
   useEffect(() => {
-    Promise.all([loadProfile(), loadReceipts()]).then(([p, list]) => {
-      setProfile(p);
-      setReceipts(list);
+    (async () => {
+      const [tr, ps, rw] = await Promise.all([cachedTier(), loadProfiles(), AsyncStorage.getItem(REWARD_KEY).catch(() => null)]);
+      const u = usableProfiles(ps, limitsFor(tr).profiles);
+      setTier(tr);
+      setProfiles({ ...ps, active: u.active });
+      try {
+        setPdfRewards(JSON.parse(rw || '{}') || {});
+      } catch {
+        // abaikan
+      }
+      await openProfile(u.active);
       setLoaded(true);
       onReady && onReady();
+      // Semak langganan sebenar selepas app dipaparkan
+      refreshTier().then(applyTier);
+      loadProducts().then(setProducts);
+    })();
+    return listenPurchases((tr) => {
+      applyTier(tr);
+      if (tr !== 'free') {
+        setPaywall(null);
+        flash(`Terima kasih! ${TIER_LABEL[tr]} kini aktif`);
+      }
     });
   }, []);
+
+  const switchProfile = async (id) => {
+    if (id === profiles.active) return;
+    const next = { ...profiles, active: id };
+    setProfiles(next);
+    saveProfiles(next);
+    await openProfile(id);
+  };
+  const addSpouse = async () => {
+    if (limits.profiles < 2) return openPaywall('profiles');
+    const next = { ...addSecondProfile(profiles), active: 'p2' };
+    setProfiles(next);
+    saveProfiles(next);
+    await openProfile('p2');
+    flash('Profil Pasangan dibuka. Kiraan dan resit diasingkan.');
+  };
+
+  const openPaywall = (reason, onUnlocked) => setPaywall({ reason, onUnlocked });
+  const grantPdfReward = async () => {
+    const r = await showRewardedAd();
+    if (r === 'closed') {
+      flash('Tonton iklan hingga habis untuk membuka PDF');
+      return;
+    }
+    // Jika iklan tidak tersedia (tiada liputan / internet), PDF tetap dibuka kali ini
+    const next = { ...pdfRewards, [receiptYear]: (pdfRewards[receiptYear] || 0) + 1 };
+    setPdfRewards(next);
+    AsyncStorage.setItem(REWARD_KEY, JSON.stringify(next)).catch(() => {});
+    const after = paywall?.onUnlocked;
+    setPaywall(null);
+    after && after();
+  };
   useEffect(() => {
     if (loaded) saveProfileDebounced(profile);
   }, [profile, loaded]);
@@ -148,10 +239,6 @@ function Main({ onReady }) {
     { key: 'pcb', label: 'PCB', value: pay.pcb, color: SEG.pcb },
   ];
 
-  const flash = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2200);
-  };
   const onShare = async () => {
     const r = await shareCard(shareRef);
     if (!r.ok) flash('Tidak dapat berkongsi pada peranti ini');
@@ -175,15 +262,54 @@ function Main({ onReady }) {
       <View style={s.header}>
         <View style={{ flex: 1 }}>
           <Text style={s.title}>Kira Gaji</Text>
-          <Text style={s.subtitle}>Kadar disemak {fmtDate(RATES.lastVerified)}</Text>
+          <Text style={s.subtitle} numberOfLines={1}>Disemak {fmtDate(RATES.lastVerified)}</Text>
         </View>
         <View style={s.badge}>
           <Text style={s.badgeText}>Tahun taksiran {receiptYear}</Text>
         </View>
+        <PressableScale
+          onPress={() => openPaywall(null)}
+          style={[s.helpBtn, tier !== 'free' && { width: undefined, paddingHorizontal: 10 }]}
+          hitSlop={6}
+          accessibilityLabel={tier === 'free' ? 'Langganan' : `Langganan ${TIER_LABEL[tier]}`}
+        >
+          {tier === 'free' ? (
+            <Ionicons name="diamond-outline" size={17} color={t.accent} />
+          ) : (
+            <Text style={{ color: t.accent, fontWeight: '800', fontSize: 12 }}>{TIER_LABEL[tier]}</Text>
+          )}
+        </PressableScale>
         <PressableScale onPress={() => setHelpOpen(true)} style={s.helpBtn} hitSlop={6} accessibilityLabel="Panduan">
           <Ionicons name="help" size={18} color={t.accent} />
         </PressableScale>
       </View>
+
+      {limits.profiles > 1 && (
+        <View style={s.profileRow} accessibilityRole="tablist">
+          {profiles.list.slice(0, limits.profiles).map((p) => {
+            const on = p.id === profiles.active;
+            return (
+              <Pressable
+                key={p.id}
+                onPress={() => switchProfile(p.id)}
+                style={[s.profileChip, on && { backgroundColor: t.accent, borderColor: t.accent }]}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: on }}
+                accessibilityLabel={`Profil ${p.name}`}
+              >
+                <Ionicons name={p.id === 'p1' ? 'person-outline' : 'heart-outline'} size={14} color={on ? t.accentText : t.accent} />
+                <Text style={{ color: on ? t.accentText : t.text, fontWeight: '700', fontSize: 13 }}>{p.name}</Text>
+              </Pressable>
+            );
+          })}
+          {profiles.list.length < 2 && (
+            <Pressable onPress={addSpouse} style={s.profileChip} accessibilityRole="button" accessibilityLabel="Tambah profil pasangan">
+              <Ionicons name="add" size={14} color={t.accent} />
+              <Text style={{ color: t.accent, fontWeight: '700', fontSize: 13 }}>Pasangan</Text>
+            </Pressable>
+          )}
+        </View>
+      )}
 
       <View style={{ paddingHorizontal: 16 }}>
         <TabBar tabs={TABS} value={tab} onChange={(k) => { setFolder(null); setTab(k); }} t={t} />
@@ -404,6 +530,11 @@ function Main({ onReady }) {
               setFolder={setFolder}
               flash={flash}
               heroStyle={s}
+              tier={tier}
+              onPaywall={openPaywall}
+              pdfRewards={pdfRewards}
+              ownerName={P.ownerName || ''}
+              setOwnerName={set('ownerName')}
               t={t}
             />
           )}
@@ -487,13 +618,28 @@ function Main({ onReady }) {
         </FadeIn>
       )}
       <HelpSheet visible={helpOpen} onClose={() => setHelpOpen(false)} content={HELP[tab]} t={t} />
-      <AdBanner />
+      <Paywall
+        visible={!!paywall}
+        reason={paywall?.reason}
+        tier={tier}
+        products={products}
+        onClose={() => setPaywall(null)}
+        onTier={applyTier}
+        onReward={grantPdfReward}
+        flash={flash}
+        t={t}
+      />
+      <AdBanner hidden={!limits.ads} />
     </SafeAreaView>
   );
 }
 
+const REWARD_KEY = 'kiragaji.pdfreward.v1';
+
 const makeStyles = (t) =>
   StyleSheet.create({
+    profileRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, marginBottom: 10 },
+    profileChip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderColor: t.line, backgroundColor: t.card, borderRadius: 999, paddingHorizontal: 12, minHeight: 36 },
     screen: { flex: 1, backgroundColor: t.bg },
     header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 },
     title: { fontSize: 28, fontWeight: '800', color: t.text, letterSpacing: -0.5 },

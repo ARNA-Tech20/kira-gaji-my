@@ -2,14 +2,14 @@
   "expo": {
     "name": "Kira Gaji MY",
     "slug": "kira-gaji",
-    "version": "1.10.0",
+    "version": "1.11.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#0B3D2E",
     "android": {
       "package": "com.rickyazwan.kiragaji",
-      "versionCode": 4,
+      "versionCode": 5,
       "adaptiveIcon": {
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
@@ -17,7 +17,8 @@
         "backgroundColor": "#0B3D2E"
       },
       "blockedPermissions": [
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW"
       ],
       "permissions": [
         "android.permission.CAMERA"
@@ -56,6 +57,13 @@
           "photosPermission": "Kira Gaji perlukan akses gambar untuk melampirkan resit. Gambar disimpan dalam telefon anda sahaja.",
           "cameraPermission": "Kira Gaji perlukan kamera untuk mengambil gambar resit. Gambar disimpan dalam telefon anda sahaja.",
           "microphonePermission": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#0F6E56",
+          "defaultChannel": "resit"
         }
       ]
     ]

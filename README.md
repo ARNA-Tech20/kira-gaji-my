@@ -14,7 +14,7 @@ npx expo start
 ### v1.1: pakej tambahan
 
 ```bash
-npx expo install @react-native-async-storage/async-storage react-native-view-shot expo-sharing react-native-safe-area-context expo-asset expo-font expo-splash-screen expo-system-ui react-native-google-mobile-ads expo-dev-client expo-image-picker expo-file-system expo-print expo-image-manipulator
+npx expo install @react-native-async-storage/async-storage react-native-view-shot expo-sharing react-native-safe-area-context expo-asset expo-font expo-splash-screen expo-system-ui react-native-google-mobile-ads expo-dev-client expo-image-picker expo-file-system expo-print expo-image-manipulator expo-notifications react-native-iap react-native-nitro-modules fflate
 # salin app.json dari pakej ini (atau gabungkan bahagian "plugins")
 npx expo run:android   # AdMob perlukan development build; Expo Go akan sembunyikan iklan
 ```
@@ -70,7 +70,7 @@ node --test tests/calc.test.mjs
 |---|---|---|
 | **MVP (sekarang)** | Gaji bersih, cukai tahunan, zakat, mod gelap, offline | Tiada (kumpul ulasan dahulu) |
 | v1.1 | Simpan profil (AsyncStorage), kongsi keputusan sebagai gambar | Iklan banner di bawah (AdMob) |
-| v1.2 | Senarai semak pelepasan LHDN penuh + simpan resit | **Pro sekali bayar RM9.90**: tiada iklan, resit tanpa had, eksport PDF |
+| v1.2 | Senarai semak pelepasan LHDN penuh + simpan resit | Langganan Plus / Pro (lihat bahagian 12) |
 | v1.3 | Nisab automatik 14 negeri, perbandingan tawaran kerja | Pro |
 | v2 | Kadar pekerja 60+, bukan warganegara, PR | Pro |
 
@@ -94,10 +94,10 @@ node --test tests/calc.test.mjs
 
 | Ujian | Arahan | Keputusan terakhir |
 |---|---|---|
-| Logik kiraan + resit + PDF | `npm run test:logic` | 21/21 lulus |
+| Logik kiraan + resit + PDF + langganan + Excel | `npm run test:logic` | 26/26 lulus |
 | ESLint (eslint-config-expo) | `npx eslint App.js src` | 0 ralat, 0 amaran |
 | Bundle Android | `npx expo export --platform android` | Berjaya |
-| Render UI (jest-expo + RTL 14) | `npx jest tests/app.ui.test.js` | 21/21 lulus |
+| Render UI (jest-expo + RTL 14) | `npx jest tests/app.ui.test.js` | 30/30 lulus |
 | Prebuild Android (ikon, splash, AdMob) | `npx expo prebuild --platform android --no-install` | Berjaya, tiada amaran |
 
 Untuk ujian UI: `npm i -D jest jest-expo @testing-library/react-native` dan tambah `"jest": { "preset": "jest-expo" }` dalam package.json.
@@ -137,3 +137,26 @@ Persediaan sekali sahaja untuk `release.yml`:
 | Privasi | Gambar dalam storan peribadi app sahaja. Kebenaran kamera/galeri diminta bila ditekan. Mikrofon disekat |
 
 Had diketahui: resit hilang jika app dinyahpasang (pengguna dinasihatkan simpan PDF). Belum ada sandaran awan atau OCR.
+
+## 12. Langganan (v1.11)
+
+| Tier | Harga | Had |
+|---|---|---|
+| Percuma | RM0 | 10 resit setahun, 1 PDF setahun selepas iklan berganjaran, iklan banner |
+| Plus | RM19.90/tahun · RM2.90/bulan | Tanpa iklan, resit dan PDF tanpa had, peringatan bulanan |
+| Pro | RM39.90/tahun · RM4.90/bulan | Plus + profil pasangan, eksport Excel. Sandaran Drive dan baca resit automatik: akan datang |
+
+Semua bayaran melalui Google Play Billing (`react-native-iap`). Tiada pelayan: status langganan dibaca dalam telefon dan disimpan sebagai cache.
+
+**Persediaan Play Console** (Monetize → Products → Subscriptions):
+
+| Produk | Base plan | Tempoh | Harga | Tawaran (pilihan) |
+|---|---|---|---|---|
+| `kiragaji_plus` | `tahunan` | 1 tahun | RM19.90 | `percubaan`: 7 hari percuma, pelanggan baharu |
+| `kiragaji_plus` | `bulanan` | 1 bulan | RM2.90 | - |
+| `kiragaji_pro` | `tahunan` | 1 tahun | RM39.90 | `pelancaran`: 7 hari percuma, kemudian RM29.90 tahun pertama |
+| `kiragaji_pro` | `bulanan` | 1 bulan | RM4.90 | - |
+
+Nama produk dan base plan mesti sama dengan `src/billing/plans.js`. Untuk menguji pembelian: muat naik AAB ke trek ujian tertutup, tambah e-mel anda di Settings → License testing, kemudian pasang app dari pautan ujian Play Store.
+
+Iklan berganjaran: ganti `PROD_REWARDED_ID` dalam `src/components/rewarded.js` dengan ID unit rewarded AdMob sebenar.

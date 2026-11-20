@@ -59,7 +59,7 @@ tr.tot td { font-weight: 800; border-top: 1.5px solid #13201A; border-bottom: no
  * @param receipts  senarai resit {id, category, date, amount, note, src}
  * @param opts      { year, categories?: string[] (hadkan kepada kategori ini), generatedAt?: Date }
  */
-export function buildReceiptsHtml(receipts, { year, categories, generatedAt = new Date() } = {}) {
+export function buildReceiptsHtml(receipts, { year, categories, ownerName, generatedAt = new Date() } = {}) {
   const inYear = receipts.filter((r) => yearOf(r) === year && (!categories || categories.includes(r.category)));
   const sum = folderSummary(inYear, year);
   const stamp = `${String(generatedAt.getDate()).padStart(2, '0')}/${String(generatedAt.getMonth() + 1).padStart(2, '0')}/${generatedAt.getFullYear()}`;
@@ -90,7 +90,7 @@ export function buildReceiptsHtml(receipts, { year, categories, generatedAt = ne
 
   const cover = `<section class="page">
     <div class="band">
-      <small>KIRA GAJI MY · TAHUN TAKSIRAN ${year}</small>
+      <small>KIRA GAJI MY · TAHUN TAKSIRAN ${year}${ownerName ? ` · ${esc(ownerName).toUpperCase()}` : ''}</small>
       <h1>${esc(title)}</h1>
       <div class="meta">
         <div><b>${sum.count}</b><span>resit</span></div>

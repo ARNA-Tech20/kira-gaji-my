@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, Image, Modal, ScrollView, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -7,13 +7,24 @@ import {
 } from '../calc/receipts';
 import { addReceipt, deleteReceipt, pickImage } from '../receiptStore';
 import { exportReceiptsPdf } from '../pdf/receiptsPdf';
-import { MoneyField, Segmented, SectionHeader } from './components';
+import { exportReceiptsXlsx } from '../export/exportXlsx';
+import { canAddReceipt, limitsFor, pdfAccess, receiptsLeft } from '../billing/plans';
+import { disableReminder, enableReminder, reminderEnabled } from '../reminders';
+import { MoneyField, Segmented, SectionHeader, ToggleRow } from './components';
 import { AnimatedNumber, FadeIn, PressableScale } from './motion';
 import { rm } from './theme';
 
 const iconFor = (c) => (c.key === 'life' ? 'heart-outline' : groupOf(c.group)?.icon || 'folder-outline');
 
-export default function ReceiptsTab({ receipts, setReceipts, year, setYear, folder, setFolder, t, flash, heroStyle }) {
+export default function ReceiptsTab({
+  receipts, setReceipts, year, setYear, folder, setFolder, t, flash, heroStyle,
+  tier = 'free', onPaywall = () => {}, pdfRewards = {}, ownerName = '', setOwnerName = () => {},
+}) {
+  const limits = limitsFor(tier);
+  const [reminder, setReminder] = useState(false);
+  useEffect(() => {
+    reminderEnabled().then(setReminder);
+  }, []);
   const [adding, setAdding] = useState(null); // null | { category }
   const [busy, setBusy] = useState(false);
   const [viewer, setViewer] = useState(null);
@@ -22,10 +33,10 @@ export default function ReceiptsTab({ receipts, setReceipts, year, setYear, fold
   const years = useMemo(() => receiptYears(receipts).slice(0, 4), [receipts]);
   const sum = useMemo(() => folderSummary(receipts, year), [receipts, year]);
 
-  const makePdf = async (categories, label) => {
+  const runPdf = async (categories, label) => {
     setBusy(true);
     try {
-      const r = await exportReceiptsPdf(receipts, { year, categories, fileLabel: label });
+      const r = await exportReceiptsPdf(receipts, { year, categories, fileLabel: label, ownerName: ownerName.trim() });
       if (!r.ok && r.reason === 'empty') flash('Tiada resit untuk dijana');
       else if (!r.ok) flash('Tidak dapat berkongsi pada peranti ini');
     } catch {
@@ -34,6 +45,44 @@ export default function ReceiptsTab({ receipts, setReceipts, year, setYear, fold
       setBusy(false);
     }
   };
+
+  const makePdf = (categories, label) => {
+    if (pdfAccess(tier, year, pdfRewards) === 'allowed') return runPdf(categories, label);
+    onPaywall('pdf', () => runPdf(categories, label));
+  };
+
+  const makeExcel = async () => {
+    if (!limits.excel) return onPaywall('excel');
+    setBusy(true);
+    try {
+      const r = await exportReceiptsXlsx(receipts, { year, profileName: ownerName.trim() });
+      if (!r.ok && r.reason === 'empty') flash('Tiada resit untuk dieksport');
+      else if (!r.ok) flash('Tidak dapat berkongsi pada peranti ini');
+    } catch {
+      flash('Excel gagal dijana. Cuba sekali lagi.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const startAdd = () => {
+    if (!canAddReceipt(tier, sum.count)) return onPaywall('receipts');
+    setAdding({ category: folder || null });
+  };
+
+  const toggleReminder = async (on) => {
+    if (!limits.reminders) return onPaywall('reminders');
+    if (on) {
+      const ok = await enableReminder();
+      setReminder(ok);
+      flash(ok ? 'Peringatan setiap 1 haribulan, 8:30 malam' : 'Benarkan notifikasi dalam Tetapan telefon');
+    } else {
+      await disableReminder();
+      setReminder(false);
+    }
+  };
+
+  const left = receiptsLeft(tier, sum.count);
 
   const remove = (r) =>
     Alert.alert('Padam resit?', `${toDisplayDate(r.date)} · ${rm(r.amount)}\nGambar juga akan dipadam dari telefon.`, [
@@ -113,7 +162,7 @@ export default function ReceiptsTab({ receipts, setReceipts, year, setYear, fold
         )}
         <View style={s.actions}>
           <PressableScale
-            onPress={() => setAdding({ category: folder || null })}
+            onPress={startAdd}
             wrapStyle={{ flex: 1 }}
             style={s.primaryBtn}
             accessibilityLabel="Tambah resit"
@@ -132,6 +181,11 @@ export default function ReceiptsTab({ receipts, setReceipts, year, setYear, fold
           </PressableScale>
         </View>
         {pdfDisabled && !busy && <Text style={s.hint}>PDF boleh dijana selepas ada sekurang-kurangnya satu resit.</Text>}
+        {left !== Infinity && (
+          <Text style={[s.hint, left === 0 && { color: t.warnFg, fontWeight: '700' }]}>
+            {left === 0 ? 'Had 10 resit percuma tahun ini sudah penuh.' : `${sum.count}/10 resit percuma digunakan tahun ini.`}
+          </Text>
+        )}
       </FadeIn>
 
       {!folder && (
@@ -214,6 +268,41 @@ export default function ReceiptsTab({ receipts, setReceipts, year, setYear, fold
               })}
             </View>
           )}
+          <SectionHeader icon="options-outline" title="Tetapan resit" t={t} />
+          <Text style={s.label}>Nama pada PDF dan Excel (pilihan)</Text>
+          <TextInput
+            value={ownerName}
+            onChangeText={setOwnerName}
+            placeholder="cth. Ahmad bin Ali"
+            placeholderTextColor={t.muted}
+            style={s.input}
+            maxLength={40}
+            accessibilityLabel="Nama pada PDF dan Excel"
+          />
+          <View style={{ height: 10 }} />
+          <PressableScale onPress={makeExcel} disabled={busy} style={s.excelRow} accessibilityLabel="Eksport Excel">
+            <Ionicons name="grid-outline" size={18} color={t.accent} />
+            <View style={{ flex: 1 }}>
+              <Text style={s.excelTitle}>Eksport Excel</Text>
+              <Text style={s.excelSub}>Ringkasan dan senarai resit {year} untuk ejen cukai</Text>
+            </View>
+            {!limits.excel ? (
+              <View style={s.lock}>
+                <Ionicons name="lock-closed" size={11} color={t.accent} />
+                <Text style={s.lockText}>Pro</Text>
+              </View>
+            ) : (
+              <Ionicons name="share-outline" size={18} color={t.muted} />
+            )}
+          </PressableScale>
+          <ToggleRow
+            icon="notifications-outline"
+            label="Peringatan bulanan"
+            hint={limits.reminders ? '1 haribulan setiap bulan, 8:30 malam' : 'Tersedia dalam Plus dan Pro'}
+            value={reminder}
+            onChange={toggleReminder}
+            t={t}
+          />
           <Text style={s.note}>
             Gambar resit disimpan dalam telefon anda sahaja, tidak dimuat naik ke mana-mana. Jana PDF sebagai salinan sandaran kerana
             data akan hilang jika app dipadam.
@@ -274,6 +363,13 @@ export default function ReceiptsTab({ receipts, setReceipts, year, setYear, fold
         recent={recent}
         onClose={() => setAdding(null)}
         onSave={async (data) => {
+          const y0 = Number(data.date.slice(0, 4));
+          const countY = receipts.filter((r) => yearOf(r) === y0).length;
+          if (!canAddReceipt(tier, countY)) {
+            setAdding(null);
+            onPaywall('receipts');
+            return;
+          }
           const next = await addReceipt(receipts, data);
           setReceipts(next);
           setAdding(null);
@@ -479,6 +575,11 @@ const styles = (t) =>
     tileCap: { color: t.muted, fontSize: 11, marginTop: 4 },
     note: { color: t.muted, fontSize: 12, lineHeight: 18, marginTop: 14 },
     hint: { color: t.muted, fontSize: 12, marginTop: 6 },
+    excelRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: t.card, borderWidth: 1, borderColor: t.line, borderRadius: 16, padding: 14, marginBottom: 10 },
+    excelTitle: { color: t.text, fontSize: 15, fontWeight: '600' },
+    excelSub: { color: t.muted, fontSize: 12, marginTop: 2 },
+    lock: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: t.accentSoft, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
+    lockText: { color: t.accent, fontSize: 11, fontWeight: '800' },
     emptyCard: { backgroundColor: t.card, borderWidth: 1, borderColor: t.line, borderRadius: 18, padding: 16, marginTop: 14 },
     emptyIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: t.accentSoft, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
     emptyTitle: { color: t.text, fontSize: 17, fontWeight: '800', marginBottom: 10 },

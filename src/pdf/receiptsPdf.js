@@ -6,7 +6,7 @@ import { buildReceiptsHtml } from './receiptsHtml';
 import { readAsDataUri } from '../receiptStore';
 import { yearOf } from '../calc/receipts';
 
-export async function exportReceiptsPdf(receipts, { year, categories, fileLabel }) {
+export async function exportReceiptsPdf(receipts, { year, categories, fileLabel, ownerName }) {
   const chosen = receipts.filter((r) => yearOf(r) === year && (!categories || categories.includes(r.category)));
   if (!chosen.length) return { ok: false, reason: 'empty' };
 
@@ -14,7 +14,7 @@ export async function exportReceiptsPdf(receipts, { year, categories, fileLabel 
   const withSrc = [];
   for (const r of chosen) withSrc.push({ ...r, src: await readAsDataUri(r.uri) });
 
-  const { html } = buildReceiptsHtml(withSrc, { year, categories });
+  const { html } = buildReceiptsHtml(withSrc, { year, categories, ownerName });
   const { uri } = await Print.printToFileAsync({ html, width: 595, height: 842, margins: { top: 0, bottom: 0, left: 0, right: 0 } });
 
   // Namakan semula supaya mudah dicari

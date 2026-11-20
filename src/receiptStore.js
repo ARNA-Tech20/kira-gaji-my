@@ -4,13 +4,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as ImagePicker from 'expo-image-picker';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
+import { profileKey, receiptDir } from './profiles';
 
 const KEY = 'kiragaji.receipts.v1';
-const ROOT = () => `${FileSystem.documentDirectory}resit/`;
+const ROOT = () => `${FileSystem.documentDirectory}${receiptDir()}`;
 
 export async function loadReceipts() {
   try {
-    const raw = await AsyncStorage.getItem(KEY);
+    const raw = await AsyncStorage.getItem(profileKey(KEY));
     const list = raw ? JSON.parse(raw) : [];
     return Array.isArray(list) ? list : [];
   } catch {
@@ -19,7 +20,7 @@ export async function loadReceipts() {
 }
 
 async function persist(list) {
-  await AsyncStorage.setItem(KEY, JSON.stringify(list));
+  await AsyncStorage.setItem(profileKey(KEY), JSON.stringify(list));
   return list;
 }
 

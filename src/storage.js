@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { profileKey } from './profiles';
 
 const KEY = 'kiragaji.profile.v1';
 
@@ -18,11 +19,12 @@ export const DEFAULT_PROFILE = {
   zakatState: '',
   hk: {},
   zakatMethod: 'kasar',
+  ownerName: '',
 };
 
 export async function loadProfile() {
   try {
-    const raw = await AsyncStorage.getItem(KEY);
+    const raw = await AsyncStorage.getItem(profileKey(KEY));
     if (!raw) return DEFAULT_PROFILE;
     return { ...DEFAULT_PROFILE, ...JSON.parse(raw) };
   } catch {
@@ -34,14 +36,15 @@ let timer = null;
 // Simpan selepas pengguna berhenti menaip (elak tulis setiap ketukan kekunci)
 export function saveProfileDebounced(profile, delay = 500) {
   clearTimeout(timer);
+  const key = profileKey(KEY); // kunci ditetapkan sekarang, bukan bila timer tamat
   timer = setTimeout(() => {
-    AsyncStorage.setItem(KEY, JSON.stringify(profile)).catch(() => {});
+    AsyncStorage.setItem(key, JSON.stringify(profile)).catch(() => {});
   }, delay);
 }
 
 export async function resetProfile() {
   try {
-    await AsyncStorage.removeItem(KEY);
+    await AsyncStorage.removeItem(profileKey(KEY));
   } catch {}
   return DEFAULT_PROFILE;
 }

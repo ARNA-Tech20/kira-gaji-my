@@ -30,7 +30,7 @@ jest.mock('expo-sharing', () => ({
   shareAsync: jest.fn(() => Promise.resolve()),
 }));
 jest.mock('react-native-google-mobile-ads', () => ({
-  BannerAd: () => null,
+  BannerAd: () => require('react').createElement(require('react-native').Text, null, 'Iklan banner'),
   BannerAdSize: { ANCHORED_ADAPTIVE_BANNER: 'ANCHORED_ADAPTIVE_BANNER' },
   TestIds: { ADAPTIVE_BANNER: 'test-banner' },
 }));
@@ -59,6 +59,27 @@ jest.mock('expo-file-system/legacy', () => ({
   moveAsync: jest.fn(() => Promise.resolve()),
   deleteAsync: jest.fn(() => Promise.resolve()),
   readAsStringAsync: jest.fn(() => Promise.resolve('AAAA')),
+  writeAsStringAsync: jest.fn(() => Promise.resolve()),
+}));
+// Tier langganan dikawal oleh ujian melalui mockTier
+let mockTier = 'free';
+jest.mock('../src/billing/billing', () => ({
+  billingAvailable: () => true,
+  cachedTier: jest.fn(() => Promise.resolve(mockTier)),
+  refreshTier: jest.fn(() => Promise.resolve(mockTier)),
+  loadProducts: jest.fn(() => Promise.resolve({})),
+  listenPurchases: () => () => {},
+  subscribe: jest.fn(() => Promise.resolve()),
+  currentSubscription: jest.fn(() => Promise.resolve(null)),
+  manageSubscriptions: jest.fn(() => Promise.resolve()),
+}));
+jest.mock('expo-notifications', () => ({
+  requestPermissionsAsync: jest.fn(() => Promise.resolve({ granted: true })),
+  setNotificationChannelAsync: jest.fn(() => Promise.resolve()),
+  scheduleNotificationAsync: jest.fn(() => Promise.resolve('n1')),
+  cancelScheduledNotificationAsync: jest.fn(() => Promise.resolve()),
+  AndroidImportance: { DEFAULT: 3 },
+  SchedulableTriggerInputTypes: { MONTHLY: 'monthly' },
 }));
 jest.mock('expo-print', () => ({ printToFileAsync: jest.fn(() => Promise.resolve({ uri: 'file:///cache/print.pdf' })) }));
 
@@ -96,6 +117,7 @@ afterAll(() => new Promise((r) => setTimeout(r, 2500)));
 beforeEach(async () => {
   await AsyncStorage.clear();
   jest.clearAllMocks();
+  mockTier = 'free';
 });
 
 describe('Splash screen', () => {
@@ -309,10 +331,15 @@ describe('Tab Resit', () => {
     await renderApp();
     await fireEvent.press(screen.getByText('Resit'));
     await addLifestyleReceipt('120');
+    await fireEvent.press(screen.getByLabelText('Jana PDF semua resit'));
+    // pengguna percuma: tonton iklan untuk 1 PDF (iklan tiada dalam ujian, jadi PDF dibuka terus)
+    expect(await screen.findByText('Pengguna percuma boleh jana 1 PDF setahun selepas menonton iklan.')).toBeTruthy();
     await act(async () => {
-      await fireEvent.press(screen.getByLabelText('Jana PDF semua resit'));
+      await fireEvent.press(screen.getByLabelText('Tonton iklan untuk 1 PDF'));
     });
     await waitFor(() => expect(Sharing.shareAsync).toHaveBeenCalled());
+    const rewards = JSON.parse(await AsyncStorage.getItem('kiragaji.pdfreward.v1'));
+    expect(rewards[new Date().getFullYear()]).toBe(1);
     const opts = Print.printToFileAsync.mock.calls[0][0];
     expect(opts).toMatchObject({ width: 595, height: 842 });
     expect(opts.html).toContain('Gaya hidup');
@@ -332,5 +359,121 @@ describe('Tab Resit', () => {
     });
     await waitFor(() => expect(FileSystem.deleteAsync).toHaveBeenCalled());
     expect(await screen.findByText(/Belum ada resit/)).toBeTruthy();
+  });
+});
+
+describe('Langganan', () => {
+  const Y = new Date().getFullYear();
+  const seed = (n, key = 'kiragaji.receipts.v1') =>
+    AsyncStorage.setItem(
+      key,
+      JSON.stringify(Array.from({ length: n }, (_, i) => ({ id: 'r' + i, category: 'lifestyle', date: `${Y}-01-${String((i % 28) + 1).padStart(2, '0')}`, amount: 10, note: '', uri: null, createdAt: i }))),
+    );
+
+  test('percuma: iklan dipaparkan, resit ke-11 membuka skrin langganan', async () => {
+    await seed(10);
+    await renderApp();
+    expect(screen.getByText('Iklan banner')).toBeTruthy();
+    await fireEvent.press(screen.getByText('Resit'));
+    expect(await screen.findByText('Had 10 resit percuma tahun ini sudah penuh.')).toBeTruthy();
+    await fireEvent.press(screen.getByLabelText('Tambah resit'));
+    expect(await screen.findByText('Had 10 resit percuma bagi tahun ini sudah penuh.')).toBeTruthy();
+    expect(screen.getByLabelText(/Pelan Pro, RM39.90 setahun/)).toBeTruthy();
+    expect(screen.queryByText('Resit baharu')).toBeNull();
+  });
+
+  test('skrin langganan: tukar bulanan dan langgan Plus', async () => {
+    const billing = require('../src/billing/billing');
+    await renderApp();
+    await fireEvent.press(screen.getByLabelText('Langganan'));
+    await fireEvent.press(await screen.findByLabelText('Bulanan'));
+    await fireEvent.press(screen.getByLabelText('Pelan Plus, RM2.90 sebulan'));
+    await act(async () => {
+      await fireEvent.press(screen.getByLabelText('Langgan Plus'));
+    });
+    expect(billing.subscribe).toHaveBeenCalledWith('kiragaji_plus', null, null);
+  });
+
+  test('Plus: tiada iklan dan tiada had resit', async () => {
+    mockTier = 'plus';
+    await seed(10);
+    await renderApp();
+    await waitFor(() => expect(screen.queryByText('Iklan banner')).toBeNull());
+    expect(screen.getByLabelText('Langganan Plus')).toBeTruthy();
+    await fireEvent.press(screen.getByText('Resit'));
+    await fireEvent.press(await screen.findByLabelText('Tambah resit'));
+    expect(await screen.findByText('Resit baharu')).toBeTruthy();
+  });
+
+  test('Excel dikunci untuk Plus', async () => {
+    mockTier = 'plus';
+    await seed(2);
+    await renderApp();
+    await fireEvent.press(screen.getByText('Resit'));
+    await fireEvent.press(await screen.findByLabelText('Eksport Excel'));
+    expect(await screen.findByText('Eksport Excel tersedia dalam Pro.')).toBeTruthy();
+  });
+
+  test('Excel dijana untuk Pro', async () => {
+    mockTier = 'pro';
+    await seed(2);
+    await renderApp();
+    await fireEvent.press(screen.getByText('Resit'));
+    await act(async () => {
+      await fireEvent.press(await screen.findByLabelText('Eksport Excel'));
+    });
+    await waitFor(() => expect(FileSystem.writeAsStringAsync).toHaveBeenCalled());
+    const [uri, b64, opts] = FileSystem.writeAsStringAsync.mock.calls[0];
+    expect(uri).toMatch(/Resit-\d{4}-saya\.xlsx$/);
+    expect(b64.startsWith('UEsD')).toBe(true); // tandatangan zip "PK"
+    expect(opts).toEqual({ encoding: 'base64' });
+    expect(Sharing.shareAsync.mock.calls[0][1].mimeType).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  });
+
+  test('Pro: profil Pasangan ada kiraan dan resit sendiri', async () => {
+    mockTier = 'pro';
+    await seed(3);
+    await renderApp();
+    await fireEvent.changeText(screen.getByLabelText('Gaji kasar bulanan'), '9000');
+    await act(async () => {
+      await fireEvent.press(screen.getByLabelText('Tambah profil pasangan'));
+    });
+    expect(await screen.findByLabelText('Profil Pasangan')).toBeTruthy();
+    // profil baharu bermula dengan nilai asal
+    await waitFor(() => expect(screen.getByLabelText('Gaji kasar bulanan').props.value).toBe('3500'));
+    await fireEvent.press(screen.getByText('Resit'));
+    expect(await screen.findByText('Belum ada resit untuk ' + Y)).toBeTruthy();
+    // kembali ke profil Saya: 3 resit masih ada
+    await act(async () => {
+      await fireEvent.press(screen.getByLabelText('Profil Saya'));
+    });
+    await fireEvent.press(screen.getByText('Resit'));
+    expect(await screen.findByText('3 resit')).toBeTruthy();
+    const saved = JSON.parse(await AsyncStorage.getItem('kiragaji.profiles.v1'));
+    expect(saved.list.map((p) => p.id)).toEqual(['p1', 'p2']);
+  });
+
+  test('percuma: profil pasangan tidak dipaparkan', async () => {
+    await renderApp();
+    expect(screen.queryByLabelText('Tambah profil pasangan')).toBeNull();
+  });
+
+  test('peringatan bulanan: dikunci untuk percuma', async () => {
+    await renderApp();
+    await fireEvent.press(screen.getByText('Resit'));
+    expect(await screen.findByText('Tersedia dalam Plus dan Pro')).toBeTruthy();
+  });
+
+  test('peringatan bulanan: dihidupkan untuk Plus', async () => {
+    mockTier = 'plus';
+    const N = require('expo-notifications');
+    await renderApp();
+    await fireEvent.press(screen.getByText('Resit'));
+    const sw = await screen.findByRole('switch');
+    await act(async () => {
+      await fireEvent(sw, 'valueChange', true);
+    });
+    await waitFor(() => expect(N.scheduleNotificationAsync).toHaveBeenCalled());
+    expect(N.scheduleNotificationAsync.mock.calls[0][0].trigger).toMatchObject({ type: 'monthly', day: 1 });
   });
 });

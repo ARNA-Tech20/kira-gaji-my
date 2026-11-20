@@ -44,6 +44,12 @@ SIMPAN RESIT CUKAI
 • Jana PDF A4 semua resit atau satu kategori, sedia untuk rujukan e-Filing
 • Gambar disimpan dalam telefon anda sahaja
 
+PLUS DAN PRO (LANGGANAN PILIHAN)
+• Percuma: semua kalkulator, 10 resit setahun, 1 PDF setahun
+• Plus: tanpa iklan, resit dan PDF tanpa had, peringatan bulanan
+• Pro: semua dalam Plus, profil untuk pasangan, eksport Excel untuk ejen cukai
+• Cuba percuma 7 hari. Batal bila-bila masa di Google Play
+
 ZAKAT PENDAPATAN
 • Pilih negeri; nisab WP dan Selangor 2026 diisi automatik
 • Banding kaedah kasar dan kaedah bersih (had kifayah)

@@ -26,6 +26,7 @@ export const HELP = {
       'Gambar disimpan dalam telefon anda sahaja dan tidak dimuat naik. Jika app dipadam, resit juga hilang, jadi simpan PDF di Google Drive atau e-mel.',
       'Had pelepasan dikenakan automatik. Folder yang melebihi had ditanda.',
       'LHDN boleh meminta resit asal sehingga 7 tahun selepas tahun taksiran.',
+      'Pelan percuma: 10 resit setahun dan 1 PDF setahun selepas iklan. Plus dan Pro membuka had ini; Pro menambah profil pasangan dan eksport Excel.',
     ],
   },
   cukai: {
