@@ -1,4 +1,4 @@
-# Kira Gaji MY — MVP
+# Kira Gaji MY
 
 Kalkulator gaji bersih, cukai pendapatan dan zakat pendapatan untuk pekerja Malaysia. Offline, tanpa daftar akaun, BM.
 
@@ -120,8 +120,6 @@ Splash natif ditahan sehingga profil dimuat, kemudian `src/ui/Splash.js` memapar
 |---|---|---|
 | `.github/workflows/ci.yml` | Setiap push ke `main` dan pull request | Ujian logik, ESLint, ujian UI, bundle Android |
 | `.github/workflows/release.yml` | Bila tag `v*` ditolak (cth. `v1.9.0`) | Ujian, semak tag = `app.json`, EAS build AAB, hantar draf ke ujian tertutup |
-| Tugas berjadual "Semak kadar Kira Gaji" | 20 Jan, Mac, Jul, Okt, 8:41 pagi | Semak kadar rasmi dan lapor perubahan |
-| Skill `penerbit-kira-gaji` | Bila diminta ("terbit versi baharu") | Kemas kini kadar, uji, tag dan keluarkan |
 
 Persediaan sekali sahaja untuk `release.yml`:
 1. Cipta token di expo.dev → Account settings → Access tokens, simpan sebagai rahsia repo `EXPO_TOKEN`.

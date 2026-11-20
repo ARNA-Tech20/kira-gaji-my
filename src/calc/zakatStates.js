@@ -18,7 +18,7 @@ export const ZAKAT_STATES = [
   { key: 'terengganu', label: 'Terengganu', name: 'Terengganu', nisab: null },
 ];
 
-// Had kifayah setahun bagi kaedah bersih — kadar Lembaga Zakat Selangor 2026.
+// Had kifayah setahun bagi kaedah bersih, kadar Lembaga Zakat Selangor 2026.
 // Negeri lain menggunakan kadar sendiri; app memaparkan amaran bila negeri lain dipilih.
 export const HAD_KIFAYAH = {
   source: 'Lembaga Zakat Selangor 2026',

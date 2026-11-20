@@ -116,7 +116,7 @@ export function buildReceiptsHtml(receipts, { year, categories, generatedAt = ne
           const img = r.src ? `<img src="${r.src}" alt="">` : `<span class="none">Tiada gambar</span>`;
           return `<div class="cell"><div class="img">${img}</div>
             <div class="cap"><span>${esc(toDisplayDate(r.date))}</span><b>${rm(r.amount)}</b></div>
-            <div class="cap"><span class="memo">${esc(r.note || '—')}</span><span class="no">#${s.offset + j + 1}</span></div></div>`;
+            <div class="cap"><span class="memo">${esc(r.note || '-')}</span><span class="no">#${s.offset + j + 1}</span></div></div>`;
         })
         .join('');
       return `<section class="page">

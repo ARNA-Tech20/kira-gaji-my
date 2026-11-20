@@ -4,9 +4,9 @@
 // PERKESO/SIP dikira berasingan dalam tax.js kerana ia automatik atau ada medan sendiri.
 //
 // type:
-//   'amount' — pengguna masukkan RM, dihadkan kepada `max`
-//   'count'  — pengguna masukkan bilangan, didarab `perUnit`
-//   'flag'   — ya/tidak, tuntutan tetap `max`
+//   'amount': pengguna masukkan RM, dihadkan kepada `max`
+//   'count':  pengguna masukkan bilangan, didarab `perUnit`
+//   'flag':   ya/tidak, tuntutan tetap `max`
 
 export const RELIEF_GROUPS = [
   { key: 'keluarga', label: 'Keluarga & anak', icon: 'people-outline' },

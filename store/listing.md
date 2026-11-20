@@ -1,4 +1,4 @@
-# Listing Google Play — Kira Gaji MY
+# Listing Google Play: Kira Gaji MY
 
 ## Aset grafik
 
@@ -8,10 +8,10 @@
 | `playstore-2.png` | 1080 × 1920 | Tangkapan skrin telefon 2 (Cukai) |
 | `playstore-3.png` | 1080 × 1920 | Tangkapan skrin telefon 3 (Zakat) |
 | `feature-graphic.png` | 1024 × 500 | Grafik ciri (wajib) |
-| `shots.html` | — | Sumber untuk ubah teks/angka; buka dalam Chrome dan tangkap semula |
+| `shots.html` | - | Sumber untuk ubah teks/angka; buka dalam Chrome dan tangkap semula |
 | `icon-512.png` | 512 × 512 | Ikon app Play Console |
-| `privacy.html` | — | Dasar privasi (BM + EN). Hos di Netlify/GitHub Pages atau kongsi pautan artifact secara awam, kemudian masukkan URL di Play Console |
-| `icon-preview.png`, `icons.html` | — | Pratonton dan sumber ikon |
+| `privacy.html` | - | Dasar privasi (BM + EN). Hos di Netlify/GitHub Pages atau kemudian masukkan URL di Play Console |
+| `icon-preview.png`, `icons.html` | - | Pratonton dan sumber ikon |
 
 ## Teks
 
@@ -21,7 +21,9 @@
 
 **Keterangan penuh:**
 
-Kira Gaji MY membantu anda faham ke mana gaji anda pergi setiap bulan — dan berapa cukai serta zakat yang perlu dibayar setahun.
+Gaji masuk, tapi kenapa yang tinggal tak sama dengan angka dalam surat tawaran? Kira Gaji MY tunjuk satu per satu: KWSP, PERKESO, PCB, dan berapa cukai serta zakat anda setahun.
+
+Musim e-Filing pula, tak payah cari resit dalam galeri dan WhatsApp lagi. Snap resit, pilih kategori, siap.
 
 GAJI BERSIH
 • KWSP, PERKESO, SIP, PCB anggaran dan LINDUNG 24 Jam dikira serentak
@@ -65,5 +67,5 @@ Kira Gaji MY ialah aplikasi bebas dan tidak berkaitan dengan LHDN, KWSP, PERKESO
 | Tag | Kalkulator, Cukai, Perancangan kewangan |
 | Penarafan kandungan | Semua orang |
 | Iklan | Ya (AdMob banner) |
-| Keselamatan data | Tiada data dikumpul oleh app (gambar resit kekal dalam telefon, tidak dihantar keluar, jadi tidak perlu diisytihar sebagai "dikumpul"); AdMob mengumpul ID peranti untuk iklan — isytihar mengikut panduan Google AdMob |
-| Dasar privasi | `privacy.html` — isi `[emel sokongan]` dahulu, kemudian hos secara awam |
+| Keselamatan data | Tiada data dikumpul oleh app (gambar resit kekal dalam telefon, tidak dihantar keluar, jadi tidak perlu diisytihar sebagai "dikumpul"); AdMob mengumpul ID peranti untuk iklan. Isytihar mengikut panduan Google AdMob |
+| Dasar privasi | `privacy.html`. Isi `[emel sokongan]` dahulu, kemudian hos secara awam |
