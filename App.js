@@ -144,7 +144,7 @@ function Main({ onReady }) {
   const segments = [
     { key: 'net', label: 'Bersih', value: Math.max(0, pay.net), color: SEG.net },
     { key: 'epf', label: 'KWSP', value: pay.epf, color: SEG.epf },
-    { key: 'perkeso', label: 'PERKESO', value: pay.socso + pay.eis + pay.skbbk, color: SEG.perkeso },
+    { key: 'perkeso', label: ['PERKESO', pay.eis > 0 && 'SIP', pay.skbbk > 0 && 'LINDUNG'].filter(Boolean).join(', '), value: pay.socso + pay.eis + pay.skbbk, color: SEG.perkeso },
     { key: 'pcb', label: 'PCB', value: pay.pcb, color: SEG.pcb },
   ];
 
@@ -178,7 +178,7 @@ function Main({ onReady }) {
           <Text style={s.subtitle}>Kadar disemak {fmtDate(RATES.lastVerified)}</Text>
         </View>
         <View style={s.badge}>
-          <Text style={s.badgeText}>{RATES.taxYearLabel}</Text>
+          <Text style={s.badgeText}>Tahun taksiran {receiptYear}</Text>
         </View>
         <PressableScale onPress={() => setHelpOpen(true)} style={s.helpBtn} hitSlop={6} accessibilityLabel="Panduan">
           <Ionicons name="help" size={18} color={t.accent} />
@@ -275,7 +275,9 @@ function Main({ onReady }) {
                   <AnimatedNumber value={tax.taxPayable} format={rm} style={s.heroValue} />
                   <View style={s.heroChips}>
                     <View style={s.chip}>
-                      <Text style={s.chipText}>≈ {rm(tax.monthlyEstimate)}/bulan</Text>
+                      <Text style={s.chipText}>
+                        {tax.taxPayable > 0 && tax.monthlyEstimate === 0 ? 'PCB tidak dipotong (bawah RM10 sebulan)' : `≈ ${rm(tax.monthlyEstimate)}/bulan`}
+                      </Text>
                     </View>
                     <View style={s.chip}>
                       <Text style={s.chipText}>Kadar efektif {tax.effectiveRate}%</Text>
@@ -411,7 +413,7 @@ function Main({ onReady }) {
               <FadeIn delay={60}>
                 <View style={s.hero}>
                   <Text style={s.heroLabel}>
-                    {num(P.nisab) === 0 ? 'Masukkan nisab untuk mula' : zakat.eligible ? 'Zakat setahun' : 'Belum mencapai nisab'}
+                    {num(P.nisab) === 0 ? 'Pilih negeri atau isi nisab' : zakat.eligible ? 'Zakat setahun' : 'Belum mencapai nisab'}
                   </Text>
                   <AnimatedNumber value={zakat.annual} format={rm} style={s.heroValue} />
                   <View style={s.heroChips}>
@@ -432,7 +434,7 @@ function Main({ onReady }) {
                 <MoneyField label="Bonus / pendapatan lain setahun" value={P.bonus} onChange={set('bonus')} t={t} />
                 <SectionHeader icon="location-outline" title="Negeri & nisab" t={t} />
                 <StatePicker value={P.zakatState} onPick={pickState} t={t} />
-                <MoneyField label="Nisab setahun" value={P.nisab} onChange={set('nisab')} placeholder="33996" t={t} />
+                <MoneyField label="Nisab setahun" value={P.nisab} onChange={set('nisab')} placeholder="cth. 33,996" t={t} />
                 <StateSourceNote stateKey={P.zakatState} t={t} />
                 <SectionHeader icon="git-compare-outline" title="Kaedah" t={t} />
                 <MethodCompare compare={zc} value={P.zakatMethod} onChange={set('zakatMethod')} t={t} />

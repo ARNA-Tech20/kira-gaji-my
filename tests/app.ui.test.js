@@ -204,6 +204,23 @@ describe('Tab Cukai', () => {
   });
 });
 
+describe('Teks yang jelas', () => {
+  test('lencana tahun taksiran, petunjuk PERKESO dan PCB bawah RM10', async () => {
+    await renderApp();
+    expect(screen.getByText('Tahun taksiran ' + new Date().getFullYear())).toBeTruthy();
+    expect(screen.getByText('PERKESO, SIP, LINDUNG')).toBeTruthy();
+    await fireEvent.press(screen.getByText('Cukai'));
+    const tax = annualTax({ monthlyGross: 3500 });
+    if (tax.taxPayable > 0 && tax.monthlyEstimate === 0) expect(await screen.findByText('PCB tidak dipotong (bawah RM10 sebulan)')).toBeTruthy();
+  });
+
+  test('zakat tanpa nisab meminta pilih negeri', async () => {
+    await renderApp();
+    await fireEvent.press(screen.getByText('Zakat'));
+    expect(await screen.findByText('Pilih negeri atau isi nisab')).toBeTruthy();
+  });
+});
+
 describe('Tab Zakat', () => {
   test('negeri WP mengisi nisab, kaedah bersih dan rebat ke tab Cukai', async () => {
     await renderApp();
@@ -248,6 +265,11 @@ describe('Tab Resit', () => {
     await renderApp();
     await fireEvent.press(screen.getByText('Resit'));
     expect(await screen.findByText('Resit tahun ' + new Date().getFullYear())).toBeTruthy();
+    // keadaan kosong: panduan ringkas, senarai penuh dilipat
+    expect(screen.getByText('Belum ada resit untuk ' + new Date().getFullYear())).toBeTruthy();
+    expect(screen.getByText('PDF boleh dijana selepas ada sekurang-kurangnya satu resit.')).toBeTruthy();
+    expect(screen.queryByLabelText('Folder Gaya hidup, 0 resit, RM 0.00')).toBeNull();
+    await fireEvent.press(screen.getByLabelText('Semua kategori, 15'));
     expect(screen.getByLabelText('Folder Gaya hidup, 0 resit, RM 0.00')).toBeTruthy();
     expect(screen.getByLabelText('Folder Zakat (rebat cukai), 0 resit, RM 0.00')).toBeTruthy();
     expect(screen.queryByLabelText('Gaji kasar bulanan')).toBeNull();
@@ -270,7 +292,8 @@ describe('Tab Resit', () => {
 
     expect(FileSystem.copyAsync).toHaveBeenCalledWith({ from: 'file:///tmp/small.jpg', to: expect.stringMatching(/^file:\/\/\/doc\/resit\/lifestyle\/.+\.jpg$/) });
     expect(await screen.findByLabelText('Folder Gaya hidup, 1 resit, RM 3,000.00')).toBeTruthy();
-    expect(screen.getByText(/Melebihi had|dikira automatik/)).toBeTruthy();
+    expect(screen.getByText(/dikira automatik dalam tab Cukai/)).toBeTruthy();
+    expect(screen.getByText('Melebihi had RM 2,500.00')).toBeTruthy();
     const stored = JSON.parse(await AsyncStorage.getItem('kiragaji.receipts.v1'));
     expect(stored).toHaveLength(1);
     expect(stored[0]).toMatchObject({ category: 'lifestyle', amount: 3000, note: 'Telefon' });

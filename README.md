@@ -97,7 +97,7 @@ node --test tests/calc.test.mjs
 | Logik kiraan + resit + PDF | `npm run test:logic` | 21/21 lulus |
 | ESLint (eslint-config-expo) | `npx eslint App.js src` | 0 ralat, 0 amaran |
 | Bundle Android | `npx expo export --platform android` | Berjaya |
-| Render UI (jest-expo + RTL 14) | `npx jest tests/app.ui.test.js` | 19/19 lulus |
+| Render UI (jest-expo + RTL 14) | `npx jest tests/app.ui.test.js` | 21/21 lulus |
 | Prebuild Android (ikon, splash, AdMob) | `npx expo prebuild --platform android --no-install` | Berjaya, tiada amaran |
 
 Untuk ujian UI: `npm i -D jest jest-expo @testing-library/react-native` dan tambah `"jest": { "preset": "jest-expo" }` dalam package.json.

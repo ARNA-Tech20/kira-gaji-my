@@ -17,6 +17,7 @@ export default function ReceiptsTab({ receipts, setReceipts, year, setYear, fold
   const [adding, setAdding] = useState(null); // null | { category }
   const [busy, setBusy] = useState(false);
   const [viewer, setViewer] = useState(null);
+  const [showAll, setShowAll] = useState(false);
 
   const years = useMemo(() => receiptYears(receipts).slice(0, 4), [receipts]);
   const sum = useMemo(() => folderSummary(receipts, year), [receipts, year]);
@@ -51,6 +52,40 @@ export default function ReceiptsTab({ receipts, setReceipts, year, setYear, fold
   const cat = folder && categoryOf(folder);
   const row = folder && sum.rows.find((x) => x.key === folder);
   const inFolder = folder ? sortReceipts(receipts.filter((r) => r.category === folder && yearOf(r) === year)) : [];
+  const pdfDisabled = busy || (folder ? !inFolder.length : !sum.count);
+  // 3 kategori terakhir digunakan, untuk borang
+  const recent = useMemo(() => [...new Set(sortReceipts(receipts).map((r) => r.category))].slice(0, 3), [receipts]);
+
+  const tile = (c) => {
+    const r = sum.rows.find((x) => x.key === c.key);
+    const pct = c.max ? Math.min(1, r.total / c.max) : 1;
+    return (
+      <PressableScale
+        key={c.key}
+        onPress={() => setFolder(c.key)}
+        wrapStyle={s.tileWrap}
+        style={s.tile}
+        accessibilityLabel={`Folder ${c.label}, ${r.count} resit, ${rm(r.total)}`}
+      >
+        <View style={s.tileTop}>
+          <Ionicons name={iconFor(c)} size={20} color={t.accent} />
+          <View style={s.count}>
+            <Text style={s.countText}>{r.count}</Text>
+          </View>
+        </View>
+        <Text style={s.tileLabel} numberOfLines={2}>
+          {c.label}
+        </Text>
+        <Text style={s.tileSum}>{rm(r.total)}</Text>
+        <View style={[s.track, { backgroundColor: t.line }]}>
+          <View style={[s.fill, { width: `${pct * 100}%`, backgroundColor: r.over ? t.warnFg : t.accent }]} />
+        </View>
+        <Text style={[s.tileCap, r.over && { color: t.warnFg, fontWeight: '700' }]}>
+          {c.max ? (r.over ? `Melebihi had ${rm(c.max)}` : `Had ${rm(c.max)}`) : 'Rebat cukai'}
+        </Text>
+      </PressableScale>
+    );
+  };
 
   return (
     <>
@@ -88,14 +123,15 @@ export default function ReceiptsTab({ receipts, setReceipts, year, setYear, fold
           </PressableScale>
           <PressableScale
             onPress={() => makePdf(folder ? [folder] : null, folder || 'semua')}
-            disabled={busy || (folder ? !inFolder.length : !sum.count)}
-            style={[s.ghostBtn, (busy || (folder ? !inFolder.length : !sum.count)) && { opacity: 0.45 }]}
+            disabled={pdfDisabled}
+            style={[s.ghostBtn, pdfDisabled && { opacity: 0.45 }]}
             accessibilityLabel={folder ? 'Jana PDF folder ini' : 'Jana PDF semua resit'}
           >
             {busy ? <ActivityIndicator color={t.accent} /> : <Ionicons name="document-text-outline" size={18} color={t.accent} />}
             <Text style={s.ghostText}>PDF A4</Text>
           </PressableScale>
         </View>
+        {pdfDisabled && !busy && <Text style={s.hint}>PDF boleh dijana selepas ada sekurang-kurangnya satu resit.</Text>}
       </FadeIn>
 
       {!folder && (
@@ -108,47 +144,76 @@ export default function ReceiptsTab({ receipts, setReceipts, year, setYear, fold
               </Text>
             </View>
           )}
-          {RECEIPT_GROUPS.map((g, gi) => {
-            const cats = RECEIPT_CATEGORIES.filter((c) => c.group === g.key);
-            if (!cats.length) return null;
-            return (
-              <View key={g.key}>
-                <SectionHeader icon={g.icon} title={g.label} t={t} first={gi === 0} />
-                <View style={s.grid}>
-                  {cats.map((c) => {
-                    const r = sum.rows.find((x) => x.key === c.key);
-                    const pct = c.max ? Math.min(1, r.total / c.max) : r.count ? 1 : 0;
-                    return (
-                      <PressableScale
-                        key={c.key}
-                        onPress={() => setFolder(c.key)}
-                        wrapStyle={s.tileWrap}
-                        style={[s.tile, r.count === 0 && { opacity: 0.72 }]}
-                        accessibilityLabel={`Folder ${c.label}, ${r.count} resit, ${rm(r.total)}`}
-                      >
-                        <View style={s.tileTop}>
-                          <Ionicons name={r.count ? 'folder' : 'folder-outline'} size={22} color={t.accent} />
-                          {r.count > 0 && (
-                            <View style={s.count}>
-                              <Text style={s.countText}>{r.count}</Text>
-                            </View>
-                          )}
-                        </View>
-                        <Text style={s.tileLabel} numberOfLines={2}>
-                          {c.label}
-                        </Text>
-                        <Text style={s.tileSum}>{r.count ? rm(r.total) : 'Kosong'}</Text>
-                        <View style={[s.track, { backgroundColor: t.line }]}>
-                          <View style={[s.fill, { width: `${pct * 100}%`, backgroundColor: r.over ? t.warnFg : t.accent }]} />
-                        </View>
-                        <Text style={s.tileCap}>{c.max ? `Had ${rm(c.max)}` : 'Rebat cukai'}</Text>
-                      </PressableScale>
-                    );
-                  })}
-                </View>
+          {sum.count === 0 && (
+            <View style={s.emptyCard}>
+              <View style={s.emptyIcon}>
+                <Ionicons name="receipt-outline" size={26} color={t.accent} />
               </View>
-            );
-          })}
+              <Text style={s.emptyTitle}>Belum ada resit untuk {year}</Text>
+              {[
+                ['camera-outline', 'Snap resit atau pilih dari galeri'],
+                ['folder-open-outline', 'Pilih kategori, contohnya Perubatan atau Gaya hidup'],
+                ['calculator-outline', 'Jumlahnya terus masuk kiraan di tab Cukai'],
+              ].map(([icon, text], i) => (
+                <View key={icon} style={s.step}>
+                  <Text style={s.stepNo}>{i + 1}</Text>
+                  <Ionicons name={icon} size={16} color={t.muted} />
+                  <Text style={s.stepText}>{text}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+          {sum.count > 0 && (
+            <>
+              <SectionHeader icon="folder-outline" title="Folder anda" t={t} first />
+              <View style={s.grid}>{sum.used.map((r) => tile(categoryOf(r.key)))}</View>
+            </>
+          )}
+          <Pressable
+            onPress={() => setShowAll((v) => !v)}
+            style={s.allToggle}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: showAll }}
+            accessibilityLabel={`Semua kategori, ${RECEIPT_CATEGORIES.length}`}
+          >
+            <Ionicons name="albums-outline" size={18} color={t.accent} />
+            <Text style={s.allText}>Semua kategori ({RECEIPT_CATEGORIES.length})</Text>
+            <Ionicons name={showAll ? 'chevron-up' : 'chevron-down'} size={18} color={t.muted} />
+          </Pressable>
+          {showAll && (
+            <View style={s.allList}>
+              {RECEIPT_GROUPS.map((g) => {
+                const cats = RECEIPT_CATEGORIES.filter((c) => c.group === g.key);
+                if (!cats.length) return null;
+                return (
+                  <View key={g.key}>
+                    <Text style={s.allGroup}>{g.label}</Text>
+                    {cats.map((c) => {
+                      const r = sum.rows.find((x) => x.key === c.key);
+                      return (
+                        <Pressable
+                          key={c.key}
+                          onPress={() => setFolder(c.key)}
+                          style={s.allRow}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Folder ${c.label}, ${r.count} resit, ${rm(r.total)}`}
+                        >
+                          <Ionicons name={iconFor(c)} size={16} color={t.accent} />
+                          <Text style={s.allLabel} numberOfLines={1}>
+                            {c.label}
+                          </Text>
+                          <Text style={[s.allSum, !r.count && { color: t.muted, fontWeight: '500' }]}>
+                            {r.count ? `${r.count} · ${rm(r.total)}` : c.max ? `had ${rm(c.max)}` : 'rebat'}
+                          </Text>
+                          <Ionicons name="chevron-forward" size={14} color={t.muted} />
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                );
+              })}
+            </View>
+          )}
           <Text style={s.note}>
             Gambar resit disimpan dalam telefon anda sahaja, tidak dimuat naik ke mana-mana. Jana PDF sebagai salinan sandaran kerana
             data akan hilang jika app dipadam.
@@ -206,6 +271,7 @@ export default function ReceiptsTab({ receipts, setReceipts, year, setYear, fold
         visible={!!adding}
         initialCategory={adding?.category}
         defaultYear={year}
+        recent={recent}
         onClose={() => setAdding(null)}
         onSave={async (data) => {
           const next = await addReceipt(receipts, data);
@@ -232,7 +298,7 @@ export default function ReceiptsTab({ receipts, setReceipts, year, setYear, fold
   );
 }
 
-function AddReceiptSheet({ visible, initialCategory, defaultYear, onClose, onSave, t }) {
+function AddReceiptSheet({ visible, initialCategory, defaultYear, recent = [], onClose, onSave, t }) {
   const [category, setCategory] = useState(null);
   const [date, setDate] = useState('');
   const [amount, setAmount] = useState('');
@@ -256,6 +322,24 @@ function AddReceiptSheet({ visible, initialCategory, defaultYear, onClose, onSav
   if (!visible && openedFor) setOpenedFor(false);
 
   const s = styles(t);
+
+  const chip = (c, prefix) => {
+    if (!c) return null;
+    const on = c.key === category;
+    return (
+      <Pressable
+        key={(prefix || '') + c.key}
+        onPress={() => setCategory(c.key)}
+        style={[s.catChip, on && { backgroundColor: t.accent, borderColor: t.accent }]}
+        accessibilityRole="radio"
+        accessibilityState={{ selected: on }}
+        accessibilityLabel={prefix ? `Terakhir: ${c.label}` : c.label}
+      >
+        <Ionicons name={iconFor(c)} size={14} color={on ? t.accentText : t.accent} />
+        <Text style={{ color: on ? t.accentText : t.text, fontSize: 13, fontWeight: '600' }}>{c.label}</Text>
+      </Pressable>
+    );
+  };
 
   const grab = async (source) => {
     const r = await pickImage(source);
@@ -311,24 +395,22 @@ function AddReceiptSheet({ visible, initialCategory, defaultYear, onClose, onSav
             </View>
 
             <Text style={s.label}>Kategori</Text>
-            <View style={s.chips}>
-              {RECEIPT_CATEGORIES.map((c) => {
-                const on = c.key === category;
-                return (
-                  <Pressable
-                    key={c.key}
-                    onPress={() => setCategory(c.key)}
-                    style={[s.catChip, on && { backgroundColor: t.accent, borderColor: t.accent }]}
-                    accessibilityRole="radio"
-                    accessibilityState={{ selected: on }}
-                    accessibilityLabel={c.label}
-                  >
-                    <Ionicons name={iconFor(c)} size={14} color={on ? t.accentText : t.accent} />
-                    <Text style={{ color: on ? t.accentText : t.text, fontSize: 13, fontWeight: '600' }}>{c.label}</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+            {recent.length > 0 && (
+              <>
+                <Text style={s.chipGroup}>Terakhir digunakan</Text>
+                <View style={s.chips}>{recent.map((k) => chip(categoryOf(k), 'recent'))}</View>
+              </>
+            )}
+            {RECEIPT_GROUPS.map((g) => {
+              const cats = RECEIPT_CATEGORIES.filter((c) => c.group === g.key);
+              if (!cats.length) return null;
+              return (
+                <View key={g.key}>
+                  <Text style={s.chipGroup}>{g.label}</Text>
+                  <View style={s.chips}>{cats.map((c) => chip(c))}</View>
+                </View>
+              );
+            })}
             {!!errors.category && <Text style={s.err}>{errors.category}</Text>}
 
             <Text style={[s.label, { marginTop: 12 }]}>Tarikh resit</Text>
@@ -390,12 +472,27 @@ const styles = (t) =>
     tileTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
     count: { backgroundColor: t.accent, borderRadius: 999, minWidth: 22, height: 22, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center' },
     countText: { color: t.accentText, fontSize: 12, fontWeight: '800' },
-    tileLabel: { color: t.text, fontSize: 13, fontWeight: '700', minHeight: 34 },
+    tileLabel: { color: t.text, fontSize: 13, fontWeight: '700', minHeight: 34, marginTop: 2 },
     tileSum: { color: t.text, fontSize: 15, fontWeight: '800', marginTop: 4, fontVariant: ['tabular-nums'] },
     track: { height: 4, borderRadius: 2, overflow: 'hidden', marginTop: 8 },
     fill: { height: 4, borderRadius: 2 },
     tileCap: { color: t.muted, fontSize: 11, marginTop: 4 },
     note: { color: t.muted, fontSize: 12, lineHeight: 18, marginTop: 14 },
+    hint: { color: t.muted, fontSize: 12, marginTop: 6 },
+    emptyCard: { backgroundColor: t.card, borderWidth: 1, borderColor: t.line, borderRadius: 18, padding: 16, marginTop: 14 },
+    emptyIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: t.accentSoft, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+    emptyTitle: { color: t.text, fontSize: 17, fontWeight: '800', marginBottom: 10 },
+    step: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 },
+    stepNo: { width: 22, height: 22, borderRadius: 11, backgroundColor: t.accentSoft, color: t.accent, fontWeight: '800', fontSize: 12, textAlign: 'center', lineHeight: 22, overflow: 'hidden' },
+    stepText: { flex: 1, color: t.text, fontSize: 14 },
+    allToggle: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 48, marginTop: 14, paddingHorizontal: 14, backgroundColor: t.card, borderWidth: 1, borderColor: t.line, borderRadius: 14 },
+    allText: { flex: 1, color: t.text, fontWeight: '700', fontSize: 14 },
+    allList: { backgroundColor: t.card, borderWidth: 1, borderColor: t.line, borderRadius: 14, paddingHorizontal: 14, paddingBottom: 6, marginTop: 8 },
+    allGroup: { color: t.muted, fontSize: 11, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase', marginTop: 12, marginBottom: 2 },
+    allRow: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 },
+    allLabel: { flex: 1, color: t.text, fontSize: 14 },
+    allSum: { color: t.text, fontSize: 12, fontWeight: '700', fontVariant: ['tabular-nums'] },
+    chipGroup: { color: t.muted, fontSize: 11, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase', marginTop: 10, marginBottom: 6 },
     back: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 12, minHeight: 44 },
     empty: { alignItems: 'center', padding: 28, borderWidth: 1, borderStyle: 'dashed', borderColor: t.line, borderRadius: 16 },
     item: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: t.card, borderWidth: 1, borderColor: t.line, borderRadius: 16, padding: 10, marginBottom: 8 },
