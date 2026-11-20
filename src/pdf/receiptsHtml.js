@@ -75,7 +75,7 @@ export function buildReceiptsHtml(receipts, { year, categories, ownerName, gener
     chunk(list, PER_PAGE).forEach((items, i, all) => sections.push({ c, row, items, part: i + 1, parts: all.length, offset: i * PER_PAGE }));
   }
   const totalPages = 1 + sections.length;
-  const foot = (n) => `<div class="foot"><span>Kira Gaji MY · dijana ${stamp} · simpan bersama dokumen e-Filing</span><span>${n} / ${totalPages}</span></div>`;
+  const foot = (n) => `<div class="foot"><span>KIRA GAJI MY · dijana ${stamp} · simpan bersama dokumen e-Filing</span><span>${n} / ${totalPages}</span></div>`;
 
   // Halaman ringkasan
   let rowsHtml = '';

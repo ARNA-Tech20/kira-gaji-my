@@ -74,7 +74,7 @@ export function buildReceiptsXlsx(receipts, { year, profileName } = {}) {
     [{ v: 'Jumlah', s: 1 }, '', sum.count, { v: sum.total, s: 4 }, '', { v: sum.claim, s: 4 }],
     [],
     [`Tahun taksiran ${year}${profileName ? ` · ${profileName}` : ''}`],
-    ['Dijana oleh Kira Gaji MY. Anggaran sahaja, rujuk garis panduan LHDN terkini.'],
+    ['Dijana oleh KIRA GAJI MY. Anggaran sahaja, rujuk garis panduan LHDN terkini.'],
   ];
 
   const order = Object.fromEntries(RECEIPT_CATEGORIES.map((c, i) => [c.key, i]));

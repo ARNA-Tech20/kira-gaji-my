@@ -261,7 +261,7 @@ function Main({ onReady }) {
       <StatusBar style="auto" />
       <View style={s.header}>
         <View style={{ flex: 1 }}>
-          <Text style={s.title}>Kira Gaji</Text>
+          <Text style={s.title}>KIRA GAJI</Text>
           <Text style={s.subtitle} numberOfLines={1}>Disemak {fmtDate(RATES.lastVerified)}</Text>
         </View>
         <View style={s.badge}>
@@ -341,7 +341,7 @@ function Main({ onReady }) {
                     <BreakdownBar segments={segments} total={pay.gross} trackColor={t.heroTrack} />
                     <Legend segments={segments} color={t.heroText} mutedColor={t.heroMuted} />
                   </View>
-                  <Text style={s.watermark}>Kira Gaji MY · anggaran sahaja</Text>
+                  <Text style={s.watermark}>KIRA GAJI MY · anggaran sahaja</Text>
                 </View>
               </FadeIn>
 
@@ -642,7 +642,7 @@ const makeStyles = (t) =>
     profileChip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderColor: t.line, backgroundColor: t.card, borderRadius: 999, paddingHorizontal: 12, minHeight: 36 },
     screen: { flex: 1, backgroundColor: t.bg },
     header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 },
-    title: { fontSize: 28, fontWeight: '800', color: t.text, letterSpacing: -0.5 },
+    title: { fontSize: 26, fontWeight: '800', color: t.text, letterSpacing: 0.6 },
     subtitle: { fontSize: 12, color: t.muted, marginTop: 2 },
     badge: { backgroundColor: t.accentSoft, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
     badgeText: { color: t.accent, fontSize: 12, fontWeight: '700' },

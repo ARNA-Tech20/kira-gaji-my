@@ -1,4 +1,4 @@
-# Listing Google Play: Kira Gaji MY
+# Listing Google Play: KIRA GAJI MY
 
 ## Aset grafik
 
@@ -15,13 +15,13 @@
 
 ## Teks
 
-**Nama app (maks 30):** Kira Gaji: KWSP PCB Zakat MY
+**Nama app (maks 30):** KIRA GAJI: KWSP PCB Zakat MY
 
 **Keterangan pendek (maks 80):** Kira gaji bersih, KWSP, PCB, cukai & zakat. Simpan resit, jana PDF. BM.
 
 **Keterangan penuh:**
 
-Gaji masuk, tapi kenapa yang tinggal tak sama dengan angka dalam surat tawaran? Kira Gaji MY tunjuk satu per satu: KWSP, PERKESO, PCB, dan berapa cukai serta zakat anda setahun.
+Gaji masuk, tapi kenapa yang tinggal tak sama dengan angka dalam surat tawaran? KIRA GAJI MY tunjuk satu per satu: KWSP, PERKESO, PCB, dan berapa cukai serta zakat anda setahun.
 
 Musim e-Filing pula, tak payah cari resit dalam galeri dan WhatsApp lagi. Snap resit, pilih kategori, siap.
 
@@ -63,7 +63,7 @@ DIREKA UNTUK ANDA
 • Panduan "?" di setiap tab
 
 PENAFIAN
-Kira Gaji MY ialah aplikasi bebas dan tidak berkaitan dengan LHDN, KWSP, PERKESO atau mana-mana pusat zakat. Semua angka ialah anggaran untuk rujukan peribadi. PCB sebenar dikira oleh majikan mengikut kaedah rasmi LHDN. Untuk kepastian zakat, rujuk pusat zakat negeri anda.
+KIRA GAJI MY ialah aplikasi bebas dan tidak berkaitan dengan LHDN, KWSP, PERKESO atau mana-mana pusat zakat. Semua angka ialah anggaran untuk rujukan peribadi. PCB sebenar dikira oleh majikan mengikut kaedah rasmi LHDN. Untuk kepastian zakat, rujuk pusat zakat negeri anda.
 
 ## Tetapan Play Console
 

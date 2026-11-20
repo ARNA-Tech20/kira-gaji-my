@@ -125,7 +125,7 @@ describe('Splash screen', () => {
     await render(<App />);
     await screen.findByText('Gaji bersih anggaran');
     await waitFor(() => expect(SplashScreen.hideAsync).toHaveBeenCalled());
-    await waitFor(() => expect(screen.queryByLabelText('Kira Gaji sedang dibuka')).toBeNull(), { timeout: 2000 });
+    await waitFor(() => expect(screen.queryByLabelText('KIRA GAJI sedang dibuka')).toBeNull(), { timeout: 2000 });
   });
 });
 

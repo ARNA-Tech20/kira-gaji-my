@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Kira Gaji MY",
+    "name": "KIRA GAJI MY",
     "slug": "kira-gaji",
     "version": "1.11.0",
     "orientation": "portrait",
@@ -54,8 +54,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Kira Gaji perlukan akses gambar untuk melampirkan resit. Gambar disimpan dalam telefon anda sahaja.",
-          "cameraPermission": "Kira Gaji perlukan kamera untuk mengambil gambar resit. Gambar disimpan dalam telefon anda sahaja.",
+          "photosPermission": "KIRA GAJI perlukan akses gambar untuk melampirkan resit. Gambar disimpan dalam telefon anda sahaja.",
+          "cameraPermission": "KIRA GAJI perlukan kamera untuk mengambil gambar resit. Gambar disimpan dalam telefon anda sahaja.",
           "microphonePermission": false
         }
       ],
