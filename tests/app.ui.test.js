@@ -229,7 +229,7 @@ describe('Tab Cukai', () => {
 describe('Teks yang jelas', () => {
   test('lencana tahun taksiran, petunjuk PERKESO dan PCB bawah RM10', async () => {
     await renderApp();
-    expect(screen.getByText('Tahun taksiran ' + new Date().getFullYear())).toBeTruthy();
+    expect(screen.getByText(new RegExp('Tahun taksiran ' + new Date().getFullYear()))).toBeTruthy();
     expect(screen.getByText('PERKESO, SIP, LINDUNG')).toBeTruthy();
     await fireEvent.press(screen.getByText('Cukai'));
     const tax = annualTax({ monthlyGross: 3500 });

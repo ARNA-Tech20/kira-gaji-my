@@ -261,11 +261,10 @@ function Main({ onReady }) {
       <StatusBar style="auto" />
       <View style={s.header}>
         <View style={{ flex: 1 }}>
-          <Text style={s.title}>KIRA GAJI</Text>
-          <Text style={s.subtitle} numberOfLines={1}>Disemak {fmtDate(RATES.lastVerified)}</Text>
-        </View>
-        <View style={s.badge}>
-          <Text style={s.badgeText}>Tahun taksiran {receiptYear}</Text>
+          <Text style={s.title} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>KIRA GAJI</Text>
+          <Text style={s.subtitle} numberOfLines={1}>
+            Tahun taksiran {receiptYear}
+          </Text>
         </View>
         <PressableScale
           onPress={() => openPaywall(null)}
@@ -601,7 +600,7 @@ function Main({ onReady }) {
         <View style={s.disclaimer}>
           <Text style={s.note}>
             Anggaran sahaja. Bukan nasihat cukai atau kewangan dan tidak berkaitan dengan LHDN, KWSP, PERKESO atau mana-mana
-            pusat zakat. PCB sebenar dikira oleh majikan menggunakan kaedah rasmi LHDN.
+            pusat zakat. PCB sebenar dikira oleh majikan menggunakan kaedah rasmi LHDN. Kadar disemak {fmtDate(RATES.lastVerified)}.
           </Text>
           {RATES.sources.map((src) => (
             <Text key={src.url} style={s.link} onPress={() => Linking.openURL(src.url)}>
@@ -642,10 +641,8 @@ const makeStyles = (t) =>
     profileChip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderColor: t.line, backgroundColor: t.card, borderRadius: 999, paddingHorizontal: 12, minHeight: 36 },
     screen: { flex: 1, backgroundColor: t.bg },
     header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 },
-    title: { fontSize: 26, fontWeight: '800', color: t.text, letterSpacing: 0.6 },
+    title: { fontSize: 24, fontWeight: '800', color: t.text, letterSpacing: 0.8 },
     subtitle: { fontSize: 12, color: t.muted, marginTop: 2 },
-    badge: { backgroundColor: t.accentSoft, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
-    badgeText: { color: t.accent, fontSize: 12, fontWeight: '700' },
     subList: { paddingLeft: 12, borderLeftWidth: 2, borderLeftColor: t.line, marginLeft: 4, marginBottom: 4 },
     helpBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: t.accentSoft, alignItems: 'center', justifyContent: 'center', marginLeft: 8 },
     body: { padding: 16, paddingBottom: 96 },

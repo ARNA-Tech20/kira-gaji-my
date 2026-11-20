@@ -51,8 +51,8 @@ export default function AnimatedSplash({ ready, onDone }) {
           transform: [{ translateY: name.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }],
         }}
       >
-        <Text style={st.name}>KIRA GAJI MY</Text>
-        <Text style={st.tag}>Gaji · Cukai · Zakat</Text>
+        <Text style={st.name}>KIRA GAJI</Text>
+        <Text style={st.tag}>GAJI · CUKAI · RESIT · ZAKAT</Text>
       </Animated.View>
     </Animated.View>
   );
@@ -60,6 +60,6 @@ export default function AnimatedSplash({ ready, onDone }) {
 
 const st = StyleSheet.create({
   wrap: { backgroundColor: SPLASH_BG, alignItems: 'center', justifyContent: 'center', zIndex: 100, elevation: 100 },
-  name: { color: '#ECF8F2', fontSize: 22, fontWeight: '800', letterSpacing: 1.2 },
-  tag: { color: '#9FD4BE', fontSize: 13, fontWeight: '600', marginTop: 4, letterSpacing: 1 },
+  name: { color: '#ECF8F2', fontSize: 28, fontWeight: '800', letterSpacing: 3 },
+  tag: { color: '#9FD4BE', fontSize: 12, fontWeight: '700', marginTop: 8, letterSpacing: 3 },
 });
