@@ -68,4 +68,4 @@ Kira Gaji MY ialah aplikasi bebas dan tidak berkaitan dengan LHDN, KWSP, PERKESO
 | Penarafan kandungan | Semua orang |
 | Iklan | Ya (AdMob banner) |
 | Keselamatan data | Tiada data dikumpul oleh app (gambar resit kekal dalam telefon, tidak dihantar keluar, jadi tidak perlu diisytihar sebagai "dikumpul"); AdMob mengumpul ID peranti untuk iklan. Isytihar mengikut panduan Google AdMob |
-| Dasar privasi | `privacy.html`. Isi `[emel sokongan]` dahulu, kemudian hos secara awam |
+| Dasar privasi | https://arna-tech20.github.io/kira-gaji-my/privacy.html (fail `docs/privacy.html`). Isi `[emel sokongan]` dahulu |

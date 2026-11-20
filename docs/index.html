@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kira Gaji MY</title>
+<meta name="description" content="Kira gaji bersih, KWSP, PERKESO, PCB, cukai pendapatan dan zakat. Offline, percuma, dalam Bahasa Melayu.">
+<link rel="icon" href="icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#F2F5F3; --surface:#FFFFFF; --fg:#13201A; --muted:#55665D; --line:#DCE4DF;
+  --band:#0B3D2E; --band-fg:#ECF8F2; --band-muted:#9FD4BE; --accent:#0F6E56; --mint:#2BB673;
+  --f-display:"Manrope",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Source Sans 3",ui-sans-serif,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0A0F0D; --surface:#131A17; --fg:#E6EEE9; --muted:#97A79E; --line:#24302A; --accent:#5DCAA5; color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:17px;line-height:1.6}
+.wrap{max-width:60rem;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{background:var(--band);color:var(--band-fg)}
+header .wrap{padding-block:3rem 2.5rem;display:grid;grid-template-columns:auto 1fr;gap:1.25rem 1.5rem;align-items:center}
+header img{width:88px;height:88px;border-radius:22px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(2rem,5vw,2.8rem);letter-spacing:-.02em;line-height:1.05;margin:0}
+.tag{color:var(--band-muted);margin:.35rem 0 0;font-size:1.1rem}
+.cta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.5rem}
+.btn{display:inline-flex;align-items:center;padding:.75rem 1.2rem;border-radius:12px;font-weight:600;text-decoration:none}
+.btn.primary{background:var(--mint);color:#04342C}
+.btn.ghost{border:1px solid rgba(255,255,255,.3);color:var(--band-fg)}
+.btn:focus-visible{outline:2px solid var(--band-fg);outline-offset:2px}
+.soon{font-size:.85rem;color:var(--band-muted);align-self:center}
+main .wrap{padding-block:2.5rem 3rem;display:flex;flex-direction:column;gap:2.5rem}
+.shots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.shots img{width:100%;height:auto;border-radius:14px;border:1px solid var(--line);display:block}
+@media (max-width:640px){.shots{grid-template-columns:repeat(3,minmax(140px,1fr));overflow-x:auto;padding-bottom:.5rem}}
+h2{font-family:var(--f-display);font-weight:800;font-size:1.35rem;margin:0 0 .75rem}
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1rem}
+.feat div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1rem 1.2rem}
+.feat h3{font-family:var(--f-display);font-size:1rem;margin:0 0 .35rem}
+.feat p{margin:0;color:var(--muted);font-size:.97rem}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:.92rem}
+footer .wrap{padding-block:1.5rem 2rem;display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;justify-content:space-between}
+footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <img src="icon-512.png" alt="Ikon Kira Gaji MY">
+    <div>
+      <h1>Kira Gaji MY</h1>
+      <p class="tag">Gaji bersih, cukai dan zakat dalam satu app. Offline, percuma, BM.</p>
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="#" aria-disabled="true">Google Play</a>
+      <a class="btn ghost" href="privacy.html">Dasar privasi</a>
+      <span class="soon">Akan datang di Google Play</span>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <section class="shots" aria-label="Tangkapan skrin">
+      <img src="skrin-1.jpg" alt="Tab Gaji: gaji bersih RM 4,269.95 daripada RM 5,000 dengan pecahan KWSP, PERKESO dan PCB" loading="lazy" width="540" height="960">
+      <img src="skrin-2.jpg" alt="Tab Cukai: cukai setahun RM 1,758.50 dan anggaran bayaran balik RM 1,841.50" loading="lazy" width="540" height="960">
+      <img src="skrin-3.jpg" alt="Tab Zakat: perbandingan kaedah kasar dan bersih bagi Wilayah Persekutuan" loading="lazy" width="540" height="960">
+    </section>
+    <section>
+      <h2>Apa yang app ini kira</h2>
+      <div class="feat">
+        <div><h3>Gaji bersih</h3><p>KWSP, PERKESO, SIP, LINDUNG 24 Jam dan PCB anggaran. Sokong pekerja bawah 60 dan 60 tahun ke atas.</p></div>
+        <div><h3>Cukai pendapatan</h3><p>19 pelepasan TT2025 dengan had automatik, serta anggaran bayaran balik atau baki selepas PCB.</p></div>
+        <div><h3>Simpan resit</h3><p>Gambar resit dalam folder ikut kategori pelepasan, terus masuk kiraan cukai, dan jana PDF A4 untuk e-Filing.</p></div>
+        <div><h3>Zakat pendapatan</h3><p>Nisab ikut negeri, kaedah kasar dan bersih, dan terus jadi rebat cukai.</p></div>
+      </div>
+    </section>
+  </div>
+</main>
+<footer>
+  <div class="wrap">
+    <span>App bebas. Tidak berkaitan dengan LHDN, KWSP, PERKESO atau mana-mana pusat zakat.</span>
+    <span><a href="privacy.html">Dasar privasi</a> · <a href="https://github.com/ARNA-Tech20">ARNA-Tech20</a></span>
+  </div>
+</footer>
+</body>
+</html>
