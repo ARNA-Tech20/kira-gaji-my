@@ -57,7 +57,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p out && cp -f smoke-* out/ 2>/dev/null || true
+          mkdir -p out && find . -maxdepth 1 -name 'smoke-*' -size +0 -exec cp -f {} out/ \;
           ls -la out
           gh release delete ujian-asap --yes --cleanup-tag 2>/dev/null || true
           gh release create ujian-asap out/* --prerelease --title "Ujian asap ${GITHUB_SHA::7}" --notes "Logcat dan tangkapan skrin daripada emulator API 34."

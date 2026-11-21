@@ -19,5 +19,6 @@ adb logcat -d -v time > smoke-logcat-penuh.txt
 adb logcat -d -v time -b crash > smoke-logcat-crash.txt
 grep -E "FATAL|AndroidRuntime|ReactNativeJS|ReactNative|Error|Exception" smoke-logcat-penuh.txt | head -400 > smoke-logcat-ringkas.txt
 cat smoke-keputusan.txt
+grep -E "ReactNativeJS" smoke-logcat-penuh.txt | grep -iE "error|warn|exception" | head -40
 cat smoke-logcat-crash.txt | head -80
 exit 0
