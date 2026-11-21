@@ -12,7 +12,7 @@ try {
 
 // GANTI dengan ID unit iklan sebenar dari AdMob sebelum terbit.
 // Semasa pembangunan, ID ujian Google digunakan supaya akaun AdMob tidak digantung.
-const PROD_BANNER_ID = 'ca-app-pub-0588853907996342/BANNER_BELUM_ADA';
+const PROD_BANNER_ID = 'ca-app-pub-0588853907996342/5140796282';
 
 export default function AdBanner({ hidden }) {
   if (hidden || !Ads || Platform.OS === 'web') return null;

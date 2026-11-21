@@ -8,8 +8,8 @@ try {
   Ads = null;
 }
 
-// GANTI dengan ID unit rewarded sebenar dari AdMob sebelum terbit.
-const PROD_REWARDED_ID = 'ca-app-pub-0588853907996342/5140796282';
+// ID unit rewarded AdMob (kiragaji_pdf).
+const PROD_REWARDED_ID = 'ca-app-pub-0588853907996342/1135595956';
 
 // Pulangkan 'earned' | 'closed' | 'unavailable'
 export function showRewardedAd(timeoutMs = 12000) {
