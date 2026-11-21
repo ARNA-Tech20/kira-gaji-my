@@ -65,6 +65,14 @@
           "color": "#0F6E56",
           "defaultChannel": "resit"
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraProguardRules": "# Room: R8 membuang konstruktor *_Impl yang dicari secara refleksi (crash WorkDatabase semasa app dibuka)\n-keep class * extends androidx.room.RoomDatabase { <init>(); }\n-keep class androidx.work.impl.WorkDatabase_Impl { *; }\n-keep class androidx.work.** { *; }\n-dontwarn androidx.work.**"
+          }
+        }
       ]
     ]
   }
