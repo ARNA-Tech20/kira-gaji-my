@@ -1,0 +1,71 @@
+# Bina APK untuk dipasang terus pada telefon (ujian). Tidak perlu akaun Expo.
+# APK ini ditandatangani dengan kunci debug: sesuai untuk diuji, BUKAN untuk dimuat naik ke Play Store
+# (guna release.yml / EAS untuk AAB rasmi).
+name: APK ujian
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['docs/**', 'store/**', '**.md']
+  workflow_dispatch:
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: npm ci
+
+      - name: Jana projek Android
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Bina APK
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
+
+      - name: Namakan APK
+        id: apk
+        run: |
+          VER=$(node -p "require('./app.json').expo.version")
+          OUT="KIRA-GAJI-${VER}-${GITHUB_SHA::7}.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "$OUT"
+          echo "file=$OUT" >> "$GITHUB_OUTPUT"
+          echo "ver=$VER" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.apk.outputs.file }}
+          path: ${{ steps.apk.outputs.file }}
+          retention-days: 30
+
+      # Pautan muat turun tetap: Releases → "APK terkini"
+      - name: Kemas kini keluaran "APK terkini"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete apk-terkini --yes --cleanup-tag 2>/dev/null || true
+          gh release create apk-terkini "${{ steps.apk.outputs.file }}" \
+            --prerelease \
+            --title "APK terkini (v${{ steps.apk.outputs.ver }}, ujian)" \
+            --notes "APK ujian daripada commit ${GITHUB_SHA::7}. Pasang terus pada telefon Android (benarkan 'Pasang apl tidak diketahui'). Ditandatangani dengan kunci debug: bukan untuk Play Store. Langganan Google Play tidak berfungsi dalam APK ini; ia hanya berfungsi bila dipasang dari Play Store."

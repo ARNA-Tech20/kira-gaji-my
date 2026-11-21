@@ -119,6 +119,7 @@ Splash natif ditahan sehingga profil dimuat, kemudian `src/ui/Splash.js` memapar
 | Komponen | Bila berjalan | Apa dibuat |
 |---|---|---|
 | `.github/workflows/ci.yml` | Setiap push ke `main` dan pull request | Ujian logik, ESLint, ujian UI, bundle Android |
+| `.github/workflows/apk.yml` | Setiap push ke `main` (kod sahaja) atau tekan *Run workflow* | Bina APK ujian, muat naik ke Releases → **APK terkini** |
 | `.github/workflows/release.yml` | Bila tag `v*` ditolak (cth. `v1.9.0`) | Ujian, semak tag = `app.json`, EAS build AAB, hantar draf ke ujian tertutup |
 
 Persediaan sekali sahaja untuk `release.yml`:
