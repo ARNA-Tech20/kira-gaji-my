@@ -9,7 +9,7 @@ try {
 }
 
 // GANTI dengan ID unit rewarded sebenar dari AdMob sebelum terbit.
-const PROD_REWARDED_ID = 'ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ';
+const PROD_REWARDED_ID = 'ca-app-pub-0588853907996342/5140796282';
 
 // Pulangkan 'earned' | 'closed' | 'unavailable'
 export function showRewardedAd(timeoutMs = 12000) {
